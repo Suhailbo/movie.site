@@ -19,63 +19,92 @@
       align-items: flex-end;
     }
 
-    .movie-card { transition: all 0.4s ease; }
-    .movie-card:hover { transform: scale(1.05); }
+    .category-tab {
+      transition: all 0.3s ease;
+      white-space: nowrap;
+    }
+    
+    .category-tab.active {
+      color: #e11d48;
+      border-bottom: 3px solid #e11d48;
+      font-weight: 600;
+    }
+
+    .movie-card {
+      transition: all 0.4s ease;
+      min-width: 160px;
+    }
+    .movie-card:hover { transform: scale(1.08); }
+
+    .horizontal-scroll::-webkit-scrollbar { display: none; }
   </style>
 </head>
 <body class="min-h-screen">
 
   <!-- NAVBAR -->
-  <nav class="fixed top-0 w-full bg-black/90 backdrop-blur-md z-50 border-b border-white/10">
+  <nav class="fixed top-0 w-full bg-black/95 backdrop-blur-md z-50 border-b border-white/10">
     <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
       <div class="flex items-center gap-3">
         <div class="w-8 h-8 bg-rose-600 rounded-2xl flex items-center justify-center text-2xl font-bold">M</div>
         <h1 class="text-2xl font-bold">MovieHub</h1>
       </div>
       
-      <div class="flex-1 max-w-[220px] mx-3">
+      <div class="flex-1 max-w-md mx-4 relative">
         <input id="searchInput" type="text" 
-               class="w-full bg-zinc-900 border border-zinc-700 rounded-full px-4 py-3 text-sm focus:outline-none focus:border-rose-500"
-               placeholder="Search movies...">
+               class="w-full bg-zinc-900 border border-zinc-700 rounded-full px-5 py-3 text-sm focus:outline-none focus:border-rose-500"
+               placeholder="Search movies, anime, K-drama...">
+        
+        <div id="autocompleteDropdown" class="hidden absolute top-full left-0 right-0 mt-2 bg-zinc-900 border border-zinc-700 rounded-2xl shadow-2xl max-h-80 overflow-auto z-50"></div>
       </div>
     </div>
   </nav>
 
   <!-- HERO -->
   <div class="hero">
-    <div class="max-w-7xl mx-auto px-4 pb-10 w-full">
-      <p class="text-emerald-400 text-xs font-medium mb-2">TRENDING #1 THIS WEEK</p>
-      <h1 class="text-4xl sm:text-5xl font-bold mb-4 leading-tight">Dune: Part Two</h1>
-      <div class="flex gap-3">
-        <button onclick="watchTrailer()" 
-                class="bg-white text-black px-6 py-3.5 rounded-2xl font-semibold flex items-center gap-2 text-sm">
-          <i class="fa-solid fa-play"></i> Trailer
-        </button>
+    <div class="max-w-7xl mx-auto px-4 pb-12 w-full">
+      <p class="text-emerald-400 text-xs tracking-widest mb-2">TRENDING #1 THIS WEEK</p>
+      <h1 class="text-4xl sm:text-5xl font-bold mb-4">Dune: Part Two</h1>
+      <button onclick="playHeroTrailer()" 
+              class="bg-white text-black px-8 py-3.5 rounded-2xl font-semibold flex items-center gap-3">
+        <i class="fa-solid fa-play"></i> Watch Trailer
+      </button>
+    </div>
+  </div>
+
+  <!-- HORIZONTAL CATEGORIES (no extra space) -->
+  <div class="sticky top-16 bg-black/95 backdrop-blur-md z-40 border-b border-white/10">
+    <div class="max-w-7xl mx-auto px-4 py-4 overflow-x-auto">
+      <div id="categoryTabs" class="flex gap-6 text-sm font-medium overflow-x-auto">
+        <div onclick="switchCategory(0)" class="category-tab active cursor-pointer pb-2" data-index="0">🔥 Trending</div>
+        <div onclick="switchCategory(1)" class="category-tab cursor-pointer pb-2" data-index="1">🎬 Movies</div>
+        <div onclick="switchCategory(2)" class="category-tab cursor-pointer pb-2" data-index="2">📺 TV Shows</div>
+        <div onclick="switchCategory(3)" class="category-tab cursor-pointer pb-2" data-index="3">💥 Action</div>
+        <div onclick="switchCategory(4)" class="category-tab cursor-pointer pb-2" data-index="4">🎌 Anime</div>
+        <div onclick="switchCategory(5)" class="category-tab cursor-pointer pb-2" data-index="5">🇰🇷 K-Drama</div>
+        <div onclick="switchCategory(6)" class="category-tab cursor-pointer pb-2" data-index="6">👻 Horror</div>
+        <div onclick="switchCategory(7)" class="category-tab cursor-pointer pb-2" data-index="7">🚀 Sci-Fi</div>
+        <div onclick="switchCategory(8)" class="category-tab cursor-pointer pb-2" data-index="8">🇮🇳 Bollywood</div>
+        <div onclick="switchCategory(9)" class="category-tab cursor-pointer pb-2" data-index="9">🇨🇳 Chinese Action</div>
       </div>
     </div>
   </div>
 
-  <!-- MAIN CONTENT -->
+  <!-- MOVIES SECTION -->
   <div class="max-w-7xl mx-auto px-4 py-8">
-    <div class="flex justify-between items-center mb-6">
-      <h2 id="sectionTitle" class="text-2xl font-semibold">Trending This Week</h2>
-      <button onclick="refreshTrending()" class="text-rose-400 text-sm flex items-center gap-2">
-        <i class="fa-solid fa-rotate"></i> Refresh
-      </button>
-    </div>
-    <div id="moviesGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4"></div>
+    <h2 id="currentCategory" class="text-2xl font-semibold mb-6">Trending This Week</h2>
+    <div id="moviesGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-5"></div>
   </div>
 
-  <!-- MODAL -->
-  <div id="modal" class="hidden fixed inset-0 bg-black/95 flex items-center justify-center z-[100] p-4">
+  <!-- MOVIE MODAL -->
+  <div id="modal" class="hidden fixed inset-0 bg-black/95 z-[200] flex items-center justify-center p-4">
     <div class="bg-zinc-900 w-full max-w-md rounded-3xl overflow-hidden">
       <div class="relative">
-        <button onclick="closeModal()" class="absolute top-4 right-4 bg-black/70 w-9 h-9 rounded-full text-xl">✕</button>
-        <img id="modalImage" class="w-full h-56 object-cover" alt="">
+        <button onclick="closeModal()" class="absolute top-4 right-4 bg-black/70 w-9 h-9 rounded-full text-xl z-10">✕</button>
+        <img id="modalBackdrop" class="w-full h-56 object-cover" alt="">
       </div>
       <div class="p-5">
         <h2 id="modalTitle" class="text-2xl font-bold"></h2>
-        <div id="modalInfo" class="text-gray-400 my-2 text-sm"></div>
+        <div id="modalInfo" class="text-gray-400 text-sm my-2"></div>
         <p id="modalOverview" class="text-gray-300 text-sm leading-relaxed"></p>
 
         <div class="mt-8">
@@ -84,13 +113,12 @@
             <button onclick="openPlatform('Netflix')" class="bg-red-600 py-4 rounded-2xl text-sm font-medium">Netflix</button>
             <button onclick="openPlatform('Prime Video')" class="bg-blue-600 py-4 rounded-2xl text-sm font-medium">Prime Video</button>
             <button onclick="openPlatform('Disney+')" class="bg-sky-600 py-4 rounded-2xl text-sm font-medium">Disney+</button>
-            <button onclick="openPlatform('')" class="bg-zinc-700 py-4 rounded-2xl text-sm font-medium">More Options</button>
+            <button onclick="openPlatform('')" class="bg-zinc-700 py-4 rounded-2xl text-sm font-medium">More</button>
           </div>
         </div>
 
-        <button onclick="watchTrailer()" 
-                class="mt-6 w-full bg-rose-600 py-4 rounded-2xl font-medium flex items-center justify-center gap-2">
-          <i class="fa-solid fa-play"></i> Watch Trailer
+        <button onclick="playTrailer()" class="mt-6 w-full bg-rose-600 py-4 rounded-2xl font-medium flex items-center justify-center gap-2">
+          <i class="fa-solid fa-play"></i> Play Trailer
         </button>
       </div>
     </div>
@@ -99,6 +127,20 @@
   <script>
     const API_KEY = "2b670b583329b90bcbad43227626c5f9";
     let currentMovie = null;
+    let currentCategoryIndex = 0;
+
+    const categories = [
+      { name: "Trending This Week", url: `https://api.themoviedb.org/3/trending/all/week?api_key=${API_KEY}` },
+      { name: "Popular Movies", url: `https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}` },
+      { name: "Popular TV Shows", url: `https://api.themoviedb.org/3/tv/popular?api_key=${API_KEY}` },
+      { name: "Action Movies", url: `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=28` },
+      { name: "Anime", url: `https://api.themoviedb.org/3/discover/tv?api_key=${API_KEY}&with_keywords=210024` },
+      { name: "K-Drama", url: `https://api.themoviedb.org/3/discover/tv?api_key=${API_KEY}&with_genres=18&with_origin_country=KR` },
+      { name: "Horror Movies", url: `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=27` },
+      { name: "Sci-Fi Movies", url: `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=878` },
+      { name: "Bollywood", url: `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=28&with_origin_country=IN` },
+      { name: "Chinese Action", url: `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=28&with_origin_country=CN` }
+    ];
 
     async function fetchMovies(url) {
       try {
@@ -114,8 +156,8 @@
       card.innerHTML = `
         <img src="https://image.tmdb.org/t/p/w500${movie.poster_path}" class="w-full aspect-[2/3] object-cover">
         <div class="p-3">
-          <h3 class="font-semibold text-sm line-clamp-2">${movie.title}</h3>
-          <div class="text-xs text-gray-400 mt-1">${movie.release_date?.split('-')[0] || ''} • ★ ${movie.vote_average?.toFixed(1)}</div>
+          <h3 class="font-semibold text-sm line-clamp-2">${movie.title || movie.name}</h3>
+          <div class="text-xs text-gray-400 mt-1">${(movie.release_date || movie.first_air_date || '').split('-')[0] || ''} • ★ ${movie.vote_average?.toFixed(1)}</div>
         </div>
       `;
       card.onclick = () => showModal(movie);
@@ -125,60 +167,122 @@
     function showModal(movie) {
       currentMovie = movie;
       document.getElementById("modal").classList.remove("hidden");
-      document.getElementById("modalImage").src = `https://image.tmdb.org/t/p/original${movie.backdrop_path || movie.poster_path}`;
-      document.getElementById("modalTitle").textContent = movie.title;
+      document.getElementById("modalBackdrop").src = `https://image.tmdb.org/t/p/original${movie.backdrop_path || movie.poster_path}`;
+      document.getElementById("modalTitle").textContent = movie.title || movie.name;
       document.getElementById("modalOverview").textContent = movie.overview || "No overview available.";
-      document.getElementById("modalInfo").innerHTML = `${movie.release_date ? movie.release_date.split('-')[0] : ''} • ★ ${movie.vote_average.toFixed(1)}`;
+      document.getElementById("modalInfo").innerHTML = `${(movie.release_date || movie.first_air_date || '').split('-')[0] || ''} • ★ ${movie.vote_average?.toFixed(1)}`;
     }
 
     function closeModal() {
       document.getElementById("modal").classList.add("hidden");
     }
 
-    function watchTrailer() {
+    function playTrailer() {
       if (!currentMovie) return;
-      window.open(`https://www.youtube.com/results?search_query=${encodeURIComponent(currentMovie.title + " official trailer")}`, "_blank");
+      closeModal();
+      document.getElementById("trailerModal").classList.remove("hidden");
+      document.getElementById("trailerTitle").textContent = currentMovie.title || currentMovie.name;
+    }
+
+    function closeTrailerModal() {
+      document.getElementById("trailerModal").classList.add("hidden");
+    }
+
+    function openYouTubeTrailer() {
+      if (!currentMovie) return;
+      const title = (currentMovie.title || currentMovie.name) + " official trailer";
+      window.open(`https://www.youtube.com/results?search_query=${encodeURIComponent(title)}`, "_blank");
+      closeTrailerModal();
+    }
+
+    function playHeroTrailer() {
+      window.open(`https://www.youtube.com/results?search_query=Dune+Part+Two+official+trailer`, "_blank");
     }
 
     function openPlatform(platform) {
       if (!currentMovie) return;
-      const title = encodeURIComponent(currentMovie.title);
-      
+      const title = encodeURIComponent(currentMovie.title || currentMovie.name);
       if (platform === "Netflix") window.open(`https://www.netflix.com/search?q=${title}`, "_blank");
       else if (platform === "Prime Video") window.open(`https://www.primevideo.com/search/ref=atv_nb_sr?phrase=${title}`, "_blank");
       else if (platform === "Disney+") window.open(`https://www.disneyplus.com/search?q=${title}`, "_blank");
       else window.open(`https://www.google.com/search?q=${title}+watch+online+Nigeria`, "_blank");
     }
 
-    async function loadMovies(url, title) {
-      document.getElementById("sectionTitle").textContent = title;
+    async function loadMovies(url, title = "Trending This Week") {
+      document.getElementById("currentCategory").textContent = title;
       const container = document.getElementById("moviesGrid");
-      container.innerHTML = `<p class="col-span-full text-center py-12 text-gray-400">Loading movies...</p>`;
+      container.innerHTML = `<p class="col-span-full text-center py-12 text-gray-400">Loading...</p>`;
 
       const movies = await fetchMovies(url);
       container.innerHTML = "";
-      
-      // Increased to 30 movies
-      movies.slice(0, 30).forEach(movie => {
-        container.appendChild(createCard(movie));
+      movies.slice(0, 30).forEach(movie => container.appendChild(createCard(movie)));
+    }
+
+    function switchCategory(index) {
+      currentCategoryIndex = index;
+      const cat = categories[index];
+      document.querySelectorAll('.category-tab').forEach(tab => {
+        tab.classList.toggle('active', parseInt(tab.dataset.index) === index);
       });
+      loadMovies(cat.url, cat.name);
     }
 
-    function refreshTrending() {
-      loadMovies(`https://api.themoviedb.org/3/trending/movie/week?api_key=${API_KEY}`, "Trending This Week");
+    // Autocomplete
+    const searchInput = document.getElementById("searchInput");
+    const dropdown = document.getElementById("autocompleteDropdown");
+    let debounceTimer;
+
+    searchInput.addEventListener("input", () => {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(showSuggestions, 300);
+    });
+
+    async function showSuggestions() {
+      const query = searchInput.value.trim();
+      if (query.length < 2) {
+        dropdown.classList.add("hidden");
+        return;
+      }
+      const results = await fetchMovies(`https://api.themoviedb.org/3/search/multi?api_key=\( {API_KEY}&query= \){encodeURIComponent(query)}`);
+      dropdown.innerHTML = "";
+      if (results.length === 0) {
+        dropdown.classList.add("hidden");
+        return;
+      }
+      results.slice(0, 8).forEach(item => {
+        const title = item.title || item.name;
+        const div = document.createElement("div");
+        div.className = "px-4 py-3 hover:bg-zinc-800 cursor-pointer flex items-center gap-3 border-b border-white/10 last:border-none";
+        div.innerHTML = `<div class="font-medium">${title}</div>`;
+        div.onclick = () => {
+          searchInput.value = title;
+          dropdown.classList.add("hidden");
+          document.getElementById("currentCategory").textContent = `Results for "${title}"`;
+          loadMovies(`https://api.themoviedb.org/3/search/multi?api_key=\( {API_KEY}&query= \){encodeURIComponent(title)}`);
+        };
+        dropdown.appendChild(div);
+      });
+      dropdown.classList.remove("hidden");
     }
 
-    document.getElementById("searchInput").addEventListener("keypress", (e) => {
+    document.addEventListener("click", (e) => {
+      if (!searchInput.contains(e.target)) dropdown.classList.add("hidden");
+    });
+
+    searchInput.addEventListener("keypress", (e) => {
       if (e.key === "Enter") {
-        const query = e.target.value.trim();
-        if (query) loadMovies(`https://api.themoviedb.org/3/search/movie?api_key=\( {API_KEY}&query= \){encodeURIComponent(query)}`, `Results for "${query}"`);
+        const query = searchInput.value.trim();
+        if (query) {
+          dropdown.classList.add("hidden");
+          document.getElementById("currentCategory").textContent = `Results for "${query}"`;
+          loadMovies(`https://api.themoviedb.org/3/search/multi?api_key=\( {API_KEY}&query= \){encodeURIComponent(query)}`);
+        }
       }
     });
 
-    setInterval(refreshTrending, 30 * 60 * 1000);
-
+    // Initialize
     window.onload = () => {
-      loadMovies(`https://api.themoviedb.org/3/trending/movie/week?api_key=${API_KEY}`, "Trending This Week");
+      loadMovies(categories[0].url, "Trending This Week");
     };
   </script>
 </body>
