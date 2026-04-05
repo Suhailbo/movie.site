@@ -5,22 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MovieHub</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
-  
-  <style>
-    body { background: #0a0a0a; color: #fff; font-family: sans-serif; }
 
+  <style>
+    body { background:#0a0a0a; color:white; font-family:sans-serif; }
+    .movie-card { transition:0.3s; cursor:pointer; }
+    .movie-card:hover { transform:scale(1.08); }
+    .category-tab.active { color:#e11d48; border-bottom:2px solid #e11d48; }
     .hero {
       background: linear-gradient(to bottom, rgba(0,0,0,0.7), #0a0a0a),
       url('https://image.tmdb.org/t/p/original/8cdWjvZQUExUUTzyp4t1vYq1c2R.jpg') center/cover;
-      min-height: 65vh;
-      display: flex;
-      align-items: flex-end;
+      height:60vh; display:flex; align-items:flex-end; padding:20px;
     }
-
-    .movie-card:hover { transform: scale(1.08); }
-    .movie-card { transition: 0.3s; }
-    .category-tab.active { color: #e11d48; border-bottom: 2px solid #e11d48; }
   </style>
 </head>
 
@@ -36,7 +31,7 @@
 <!-- MAIN -->
 <div id="mainPage" class="pt-16">
 
-  <div class="hero p-6">
+  <div class="hero">
     <div>
       <h1 class="text-4xl font-bold mb-3">Dune: Part Two</h1>
       <button onclick="playHeroTrailer()" class="bg-white text-black px-6 py-3 rounded-xl">
@@ -45,6 +40,7 @@
     </div>
   </div>
 
+  <!-- categories -->
   <div class="p-4 flex gap-4 overflow-x-auto">
     <div onclick="switchCategory(0)" class="category-tab active cursor-pointer" data-index="0">Trending</div>
     <div onclick="switchCategory(1)" class="category-tab cursor-pointer" data-index="1">Movies</div>
@@ -53,29 +49,31 @@
     <div onclick="switchCategory(4)" class="category-tab cursor-pointer" data-index="4">Anime</div>
   </div>
 
+  <!-- movies -->
   <div id="moviesGrid" class="p-4 grid grid-cols-2 md:grid-cols-4 gap-4"></div>
 </div>
 
 <!-- SEARCH -->
 <div id="searchPage" class="hidden fixed inset-0 bg-black p-4 z-50">
   <button onclick="closeSearchPage()">←</button>
-  <input id="searchInputFull" placeholder="Search..." class="w-full p-3 my-4 bg-zinc-800 rounded">
+  <input id="searchInputFull" class="w-full p-3 my-4 bg-zinc-800 rounded" placeholder="Search...">
   <div id="searchResults" class="grid grid-cols-2 md:grid-cols-4 gap-4"></div>
 </div>
 
 <!-- DETAILS -->
 <div id="detailsPage" class="hidden fixed inset-0 bg-black p-6 z-50">
   <button onclick="closeDetailsPage()">←</button>
-  <img id="detailsPoster" class="w-48 my-4 rounded">
+  <img id="detailsPoster" class="w-48 rounded my-4">
   <h1 id="detailsTitle" class="text-2xl font-bold"></h1>
   <p id="detailsOverview" class="text-gray-400"></p>
+
   <button onclick="playTrailerFromDetails()" class="mt-4 bg-red-600 px-5 py-3 rounded">
     ▶ Watch Trailer
   </button>
 </div>
 
-<!-- TRAILER MODAL -->
-<div id="trailerModal" class="hidden fixed inset-0 bg-black/90 z-50 flex items-center justify-center">
+<!-- TRAILER -->
+<div id="trailerModal" class="hidden fixed inset-0 bg-black/90 flex items-center justify-center z-50">
   <div class="w-full max-w-3xl relative">
     <button onclick="closeTrailer()" class="absolute -top-10 right-0 text-2xl">✕</button>
     <iframe id="trailerFrame" class="w-full aspect-video" allowfullscreen></iframe>
@@ -87,25 +85,118 @@ const API_KEY = "2b670b583329b90bcbad43227626c5f9";
 let currentMovie = null;
 
 const categories = [
-  { name: "Trending", url: `https://api.themoviedb.org/3/trending/all/week?api_key=${API_KEY}` },
-  { name: "Movies", url: `https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}` },
-  { name: "TV", url: `https://api.themoviedb.org/3/tv/popular?api_key=${API_KEY}` },
-  { name: "Action", url: `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=28` },
-  { name: "Anime", url: `https://api.themoviedb.org/3/discover/tv?api_key=${API_KEY}&with_original_language=ja` }
+  { url:`https://api.themoviedb.org/3/trending/all/week?api_key=${API_KEY}` },
+  { url:`https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}` },
+  { url:`https://api.themoviedb.org/3/tv/popular?api_key=${API_KEY}` },
+  { url:`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=28` },
+  { url:`https://api.themoviedb.org/3/discover/tv?api_key=${API_KEY}&with_original_language=ja` }
 ];
 
-async function fetchMovies(url) {
+async function fetchMovies(url){
   const res = await fetch(url);
   const data = await res.json();
   return data.results || [];
 }
 
-function createCard(movie) {
+function createCard(movie){
   const poster = movie.poster_path
     ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
     : "https://via.placeholder.com/500x750?text=No+Image";
 
   return `
-    <div class="movie-card cursor-pointer" onclick='showDetails(${JSON.stringify(movie)})'>
+    <div class="movie-card">
       <img src="${poster}" class="rounded">
-      <p>${
+      <p>${movie.title || movie.name}</p>
+    </div>
+  `;
+}
+
+async function loadMovies(url){
+  const movies = await fetchMovies(url);
+  const grid = document.getElementById("moviesGrid");
+
+  grid.innerHTML = movies.map(createCard).join('');
+
+  grid.querySelectorAll(".movie-card").forEach((card, i)=>{
+    card.onclick = ()=> showDetails(movies[i]);
+  });
+}
+
+function switchCategory(i){
+  document.querySelectorAll('.category-tab').forEach(tab=>{
+    tab.classList.toggle('active', tab.dataset.index==i);
+  });
+  loadMovies(categories[i].url);
+}
+
+function showDetails(movie){
+  currentMovie = movie;
+  document.getElementById("mainPage").classList.add("hidden");
+  document.getElementById("detailsPage").classList.remove("hidden");
+
+  document.getElementById("detailsPoster").src =
+    movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : "";
+
+  document.getElementById("detailsTitle").textContent = movie.title || movie.name;
+  document.getElementById("detailsOverview").textContent = movie.overview;
+}
+
+function closeDetailsPage(){
+  document.getElementById("detailsPage").classList.add("hidden");
+  document.getElementById("mainPage").classList.remove("hidden");
+}
+
+function openSearchPage(){
+  document.getElementById("mainPage").classList.add("hidden");
+  document.getElementById("searchPage").classList.remove("hidden");
+}
+
+function closeSearchPage(){
+  document.getElementById("searchPage").classList.add("hidden");
+  document.getElementById("mainPage").classList.remove("hidden");
+}
+
+document.getElementById("searchInputFull").addEventListener("input", async e=>{
+  const query = e.target.value.trim();
+  if(query.length < 3) return;
+
+  const results = await fetchMovies(
+    `https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(query)}`
+  );
+
+  document.getElementById("searchResults").innerHTML = results.map(createCard).join('');
+});
+
+async function playTrailerFromDetails(){
+  const type = currentMovie.title ? "movie":"tv";
+
+  const res = await fetch(
+    `https://api.themoviedb.org/3/${type}/${currentMovie.id}/videos?api_key=${API_KEY}`
+  );
+  const data = await res.json();
+
+  const trailer = data.results.find(v=>v.type==="Trailer");
+
+  if(trailer){
+    document.getElementById("trailerFrame").src =
+      `https://www.youtube.com/embed/${trailer.key}?autoplay=1`;
+    document.getElementById("trailerModal").classList.remove("hidden");
+  }
+}
+
+function playHeroTrailer(){
+  document.getElementById("trailerFrame").src =
+    "https://www.youtube.com/embed/U2Qp5pL3ovA?autoplay=1";
+  document.getElementById("trailerModal").classList.remove("hidden");
+}
+
+function closeTrailer(){
+  document.getElementById("trailerModal").classList.add("hidden");
+  document.getElementById("trailerFrame").src="";
+}
+
+window.onload = ()=> loadMovies(categories[0].url);
+</script>
+
+</body>
+</html>
