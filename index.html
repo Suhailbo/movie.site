@@ -12,13 +12,30 @@
 crossorigin="anonymous"></script>
 
 <style>
-body { background:#000; color:white; font-family:sans-serif; }
+body { background:#000; color:white; }
 
 .scroll { display:flex; overflow-x:auto; gap:14px; }
 .scroll::-webkit-scrollbar { display:none; }
 
 .card { min-width:150px; cursor:pointer; transition:.3s; }
 .card:hover { transform:scale(1.1); }
+
+.hero {
+ height:85vh;
+ position:relative;
+}
+
+.hero iframe {
+ position:absolute;
+ width:100%;
+ height:100%;
+}
+
+.overlay {
+ position:absolute;
+ inset:0;
+ background:linear-gradient(to top, black, transparent);
+}
 
 .gridSearch {
  display:grid;
@@ -42,19 +59,18 @@ body { background:#000; color:white; font-family:sans-serif; }
 
 <!-- NAV -->
 <nav class="fixed w-full bg-black flex justify-between p-4 z-50">
-<h1 class="font-bold cursor-pointer" onclick="goHome()">🎬 MovieHub</h1>
+<h1 onclick="goHome()" class="font-bold cursor-pointer">🎬 MovieHub</h1>
 
 <input id="searchInput"
 placeholder="Search movies..."
 class="bg-gray-800 px-3 py-1 rounded w-1/2">
 </nav>
 
-<div class="pt-20 px-4">
+<div class="pt-20">
 
 <!-- SEARCH -->
-<div id="searchPage" style="display:none;">
+<div id="searchPage" style="display:none;" class="px-4">
 <button onclick="goHome()" class="mb-3 bg-gray-700 px-3 py-1">← Back</button>
-
 <h2 class="text-xl mb-3">Search Results</h2>
 <div id="searchResults" class="gridSearch"></div>
 </div>
@@ -62,7 +78,21 @@ class="bg-gray-800 px-3 py-1 rounded w-1/2">
 <!-- HOME -->
 <div id="homePage">
 
-<h2 class="text-xl mb-2">🔥 Top 10</h2>
+<!-- HERO -->
+<div class="hero">
+<iframe id="heroVideo" src="" frameborder="0" allow="autoplay"></iframe>
+<div class="overlay"></div>
+
+<div class="absolute bottom-10 left-6 z-10">
+<h1 id="heroTitle" class="text-4xl font-bold"></h1>
+<p id="heroDesc" class="max-w-lg text-gray-300"></p>
+<button onclick="openModal(heroMovie)" class="mt-3 bg-white text-black px-4 py-2">▶ Watch Trailer</button>
+</div>
+</div>
+
+<div class="px-4">
+
+<h2 class="text-xl mt-6 mb-2">🔥 Top 10</h2>
 <div id="top10" class="scroll mb-6"></div>
 
 <h2 class="text-xl mb-2">▶ Continue Watching</h2>
@@ -82,6 +112,7 @@ data-full-width-responsive="true"></ins>
 <div id="rows"></div>
 
 </div>
+</div>
 
 </div>
 
@@ -91,7 +122,6 @@ data-full-width-responsive="true"></ins>
 
 <h2 id="mTitle" class="text-xl mb-2"></h2>
 
-<!-- STREAMING BADGES -->
 <div class="flex gap-3 my-3 text-xs">
 <span class="bg-red-600 px-2 py-1 rounded">Netflix</span>
 <span class="bg-blue-600 px-2 py-1 rounded">Prime</span>
@@ -99,7 +129,6 @@ data-full-width-responsive="true"></ins>
 <span class="bg-purple-600 px-2 py-1 rounded">HBO</span>
 </div>
 
-<!-- TRAILER -->
 <div id="trailerBox" class="mb-3"></div>
 
 <p id="mDesc" class="text-gray-300"></p>
@@ -114,11 +143,9 @@ data-full-width-responsive="true"></ins>
 </div>
 
 <!-- FOOTER -->
-<footer class="bg-black text-gray-400 mt-16 px-6 py-10 border-t border-gray-800">
-<div class="text-center text-sm">
+<footer class="bg-black text-gray-400 mt-16 px-6 py-10 border-t border-gray-800 text-center">
 <p>© 2026 MovieHub</p>
 <p>Email: eh710214@gmail.com | Phone: +2349049696168</p>
-</div>
 </footer>
 
 <script>
@@ -127,6 +154,7 @@ const API_KEY="2b670b583329b90bcbad43227626c5f9";
 
 let currentMovie=null;
 let currentTrailer=null;
+let heroMovie=null;
 let contData=JSON.parse(localStorage.getItem("continue")||"[]");
 
 function goHome(){
@@ -160,12 +188,24 @@ searchInput.oninput=async()=>{
  });
 };
 
-// TRAILER FETCH
+// TRAILER
 async function getTrailer(id){
  const res=await fetch(`https://api.themoviedb.org/3/movie/${id}/videos?api_key=${API_KEY}`);
  const data=await res.json();
  const t=data.results.find(v=>v.type==="Trailer");
  return t ? t.key : null;
+}
+
+// HERO SET
+async function setHero(movie){
+ heroMovie=movie;
+ heroTitle.innerText=movie.title;
+ heroDesc.innerText=movie.overview;
+
+ const t=await getTrailer(movie.id);
+ if(t){
+  heroVideo.src=`https://www.youtube.com/embed/${t}?autoplay=1&mute=1`;
+ }
 }
 
 // MODAL
@@ -174,22 +214,19 @@ async function openModal(m){
  mTitle.innerText=m.title;
  mDesc.innerText=m.overview;
 
- currentTrailer = await getTrailer(m.id);
+ currentTrailer=await getTrailer(m.id);
  trailerBox.innerHTML="";
 
  modal.style.display="flex";
 }
 
 function playTrailer(){
- if(!currentTrailer){
-  alert("No trailer available");
-  return;
- }
+ if(!currentTrailer) return alert("No trailer");
 
  trailerBox.innerHTML=`
  <iframe width="100%" height="200"
  src="https://www.youtube.com/embed/${currentTrailer}?autoplay=1"
- frameborder="0" allow="autoplay"></iframe>`;
+ frameborder="0"></iframe>`;
 }
 
 function closeModal(){
@@ -223,6 +260,8 @@ async function load(){
 
  const trending=await fetch(`https://api.themoviedb.org/3/trending/movie/week?api_key=${API_KEY}`).then(r=>r.json());
 
+ setHero(trending.results[0]);
+
  top10.innerHTML=trending.results.slice(0,10).map(card).join("");
 
  document.querySelectorAll("#top10 .card").forEach((c,i)=>{
@@ -233,9 +272,7 @@ async function load(){
  ["Action",28],
  ["Comedy",35],
  ["Horror",27],
- ["Sci-Fi",878],
- ["Romance",10749],
- ["Drama",18]
+ ["Sci-Fi",878]
  ];
 
  for(const [name,id] of genres){
