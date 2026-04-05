@@ -7,7 +7,7 @@
 
 <script src="https://cdn.tailwindcss.com"></script>
 
-<!-- ✅ ADSENSE SCRIPT (ONLY ONCE) -->
+<!-- ADSENSE -->
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2257272049115568"
 crossorigin="anonymous"></script>
 
@@ -17,11 +17,7 @@ body { background:#000; color:white; font-family:sans-serif; }
 .scroll { display:flex; overflow-x:auto; gap:14px; }
 .scroll::-webkit-scrollbar { display:none; }
 
-.card {
- min-width:150px;
- cursor:pointer;
- transition:.3s;
-}
+.card { min-width:150px; cursor:pointer; transition:.3s; }
 .card:hover { transform:scale(1.1); }
 
 .gridSearch {
@@ -57,6 +53,8 @@ class="bg-gray-800 px-3 py-1 rounded w-1/2">
 
 <!-- SEARCH -->
 <div id="searchPage" style="display:none;">
+<button onclick="goHome()" class="mb-3 bg-gray-700 px-3 py-1">← Back</button>
+
 <h2 class="text-xl mb-3">Search Results</h2>
 <div id="searchResults" class="gridSearch"></div>
 </div>
@@ -70,10 +68,7 @@ class="bg-gray-800 px-3 py-1 rounded w-1/2">
 <h2 class="text-xl mb-2">▶ Continue Watching</h2>
 <div id="continueRow" class="scroll mb-6"></div>
 
-<h2 class="text-xl mb-2">⭐ My List</h2>
-<div id="myList" class="scroll mb-6"></div>
-
-<!-- ✅ AD (TOP POSITION) -->
+<!-- AD -->
 <div class="text-center my-6">
 <ins class="adsbygoogle"
 style="display:block"
@@ -91,67 +86,39 @@ data-full-width-responsive="true"></ins>
 </div>
 
 <!-- MODAL -->
-<div id="modal" class="modal">
-<div class="bg-black p-5 max-w-lg">
-<h2 id="mTitle" class="text-xl"></h2>
+<div id="modal" class="modal flex items-center justify-center">
+<div class="bg-black p-5 max-w-lg w-full">
+
+<h2 id="mTitle" class="text-xl mb-2"></h2>
+
+<!-- STREAMING BADGES -->
+<div class="flex gap-3 my-3 text-xs">
+<span class="bg-red-600 px-2 py-1 rounded">Netflix</span>
+<span class="bg-blue-600 px-2 py-1 rounded">Prime</span>
+<span class="bg-indigo-600 px-2 py-1 rounded">Disney+</span>
+<span class="bg-purple-600 px-2 py-1 rounded">HBO</span>
+</div>
+
+<!-- TRAILER -->
+<div id="trailerBox" class="mb-3"></div>
+
 <p id="mDesc" class="text-gray-300"></p>
 
 <div class="flex gap-3 mt-3">
-<button onclick="addToList()" class="bg-white text-black px-3 py-1">+ My List</button>
+<button onclick="playTrailer()" class="bg-white text-black px-3 py-1">▶ Watch Trailer</button>
 <button onclick="saveContinue()" class="bg-gray-700 px-3 py-1">▶ Continue</button>
 <button onclick="closeModal()" class="bg-red-600 px-3 py-1">Close</button>
 </div>
+
 </div>
 </div>
 
-<!-- PREMIUM FOOTER -->
+<!-- FOOTER -->
 <footer class="bg-black text-gray-400 mt-16 px-6 py-10 border-t border-gray-800">
-
-<div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-sm">
-
-<div>
-<h2 class="text-white font-bold mb-3">🎬 MovieHub</h2>
-<p class="text-gray-500">
-Discover movies, watch trailers, and explore trending content worldwide.
-</p>
+<div class="text-center text-sm">
+<p>© 2026 MovieHub</p>
+<p>Email: eh710214@gmail.com | Phone: +2349049696168</p>
 </div>
-
-<div>
-<h3 class="text-white mb-3 font-semibold">Navigation</h3>
-<ul class="space-y-2">
-<li onclick="goHome()" class="cursor-pointer hover:text-white">Home</li>
-<li class="hover:text-white">Top 10</li>
-<li class="hover:text-white">My List</li>
-<li class="hover:text-white">Continue Watching</li>
-</ul>
-</div>
-
-<div>
-<h3 class="text-white mb-3 font-semibold">Legal</h3>
-<ul class="space-y-2">
-<li>Privacy Policy</li>
-<li>Terms of Use</li>
-<li>Disclaimer</li>
-</ul>
-</div>
-
-<div>
-<h3 class="text-white mb-3 font-semibold">Contact</h3>
-<ul class="space-y-2">
-<li>Email: eh710214@gmail.com</li>
-<li>Phone: +2349049696168</li>
-</ul>
-</div>
-
-</div>
-
-<div class="border-t border-gray-800 mt-8 pt-6 text-center text-gray-500 text-sm">
-<p>© 2026 MovieHub. All rights reserved.</p>
-<p class="mt-2">
-This site does not host movies. All rights belong to their respective owners.
-</p>
-</div>
-
 </footer>
 
 <script>
@@ -159,7 +126,7 @@ This site does not host movies. All rights belong to their respective owners.
 const API_KEY="2b670b583329b90bcbad43227626c5f9";
 
 let currentMovie=null;
-let myListData=JSON.parse(localStorage.getItem("myList")||"[]");
+let currentTrailer=null;
 let contData=JSON.parse(localStorage.getItem("continue")||"[]");
 
 function goHome(){
@@ -172,8 +139,7 @@ searchInput.oninput=async()=>{
  const q=searchInput.value;
 
  if(q.length<2){
-  searchPage.style.display="none";
-  homePage.style.display="block";
+  goHome();
   return;
  }
 
@@ -194,43 +160,65 @@ searchInput.oninput=async()=>{
  });
 };
 
-function card(m){
- return `<div class="card">
- <img src="https://image.tmdb.org/t/p/w300${m.poster_path}">
- </div>`;
+// TRAILER FETCH
+async function getTrailer(id){
+ const res=await fetch(`https://api.themoviedb.org/3/movie/${id}/videos?api_key=${API_KEY}`);
+ const data=await res.json();
+ const t=data.results.find(v=>v.type==="Trailer");
+ return t ? t.key : null;
 }
 
-function openModal(m){
+// MODAL
+async function openModal(m){
  currentMovie=m;
  mTitle.innerText=m.title;
  mDesc.innerText=m.overview;
+
+ currentTrailer = await getTrailer(m.id);
+ trailerBox.innerHTML="";
+
  modal.style.display="flex";
+}
+
+function playTrailer(){
+ if(!currentTrailer){
+  alert("No trailer available");
+  return;
+ }
+
+ trailerBox.innerHTML=`
+ <iframe width="100%" height="200"
+ src="https://www.youtube.com/embed/${currentTrailer}?autoplay=1"
+ frameborder="0" allow="autoplay"></iframe>`;
 }
 
 function closeModal(){
  modal.style.display="none";
+ trailerBox.innerHTML="";
 }
 
-function addToList(){
- myListData.unshift(currentMovie);
- localStorage.setItem("myList",JSON.stringify(myListData));
- renderMyList();
-}
-
+// CONTINUE
 function saveContinue(){
  contData.unshift(currentMovie);
  localStorage.setItem("continue",JSON.stringify(contData));
  renderContinue();
 }
 
-function renderMyList(){
- myList.innerHTML=myListData.map(card).join("");
-}
-
 function renderContinue(){
- continueRow.innerHTML=contData.map(card).join("");
+ continueRow.innerHTML=contData.map(m=>`
+ <div class="card">
+ <img src="https://image.tmdb.org/t/p/w300${m.poster_path}">
+ </div>`).join("");
 }
 
+// CARD
+function card(m){
+ return `<div class="card">
+ <img src="https://image.tmdb.org/t/p/w300${m.poster_path}">
+ </div>`;
+}
+
+// LOAD
 async function load(){
 
  const trending=await fetch(`https://api.themoviedb.org/3/trending/movie/week?api_key=${API_KEY}`).then(r=>r.json());
@@ -258,13 +246,15 @@ async function load(){
   rows.innerHTML+=`
   <h2 class="mt-6">${name}</h2>
   <div class="scroll">${data.results.map(card).join("")}</div>`;
+
+  const cards=rows.lastElementChild.querySelectorAll(".card");
+  cards.forEach((c,i)=>c.onclick=()=>openModal(data.results[i]));
  }
 
 }
 
 window.onload=()=>{
  load();
- renderMyList();
  renderContinue();
 };
 
