@@ -1,409 +1,173 @@
-‎‎<!DOCTYPE html>
-‎<html lang="en">
-‎<head>
-‎  <meta charset="UTF-8">
-‎  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-‎  <title>MovieHub • Premium</title>
-‎  
-‎  <!-- Tailwind CSS CDN -->
-‎  <script src="https://cdn.tailwindcss.com"></script>
-‎  <!-- Font Awesome -->
-‎  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
-‎  
-‎  <style>
-‎    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-‎    
-‎    :root {
-‎      --primary: #e11d48;
-‎    }
-‎    
-‎    body {
-‎      font-family: 'Inter', system-ui, sans-serif;
-‎      background: #0a0a0a;
-‎      color: #f1f1f1;
-‎    }
-‎    
-‎    .hero {
-‎      background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.85)), 
-‎                  url('https://image.tmdb.org/t/p/original/8cdWjvZQUExUUTzyp4t1vYq1c2R.jpg') center/cover no-repeat;
-‎      height: 85vh;
-‎      position: relative;
-‎    }
-‎    
-‎    .glass {
-‎      background: rgba(255, 255, 255, 0.08);
-‎      backdrop-filter: blur(20px);
-‎      border: 1px solid rgba(255,255,255,0.1);
-‎    }
-‎    
-‎    .movie-card {
-‎      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-‎      overflow: hidden;
-‎    }
-‎    
-‎    .movie-card:hover {
-‎      transform: translateY(-12px) scale(1.04);
-‎      box-shadow: 0 25px 50px -12px rgb(225 29 72 / 0.4);
-‎    }
-‎    
-‎    .movie-card img {
-‎      transition: transform 0.6s ease;
-‎    }
-‎    
-‎    .movie-card:hover img {
-‎      transform: scale(1.12);
-‎    }
-‎    
-‎    .rating {
-‎      background: rgba(0,0,0,0.7);
-‎      padding: 2px 8px;
-‎      border-radius: 9999px;
-‎      font-size: 0.8rem;
-‎    }
-‎    
-‎    .section-title {
-‎      position: relative;
-‎      display: inline-block;
-‎    }
-‎    
-‎    .section-title:after {
-‎      content: '';
-‎      position: absolute;
-‎      bottom: -6px;
-‎      left: 0;
-‎      width: 60%;
-‎      height: 3px;
-‎      background: var(--primary);
-‎      border-radius: 9999px;
-‎    }
-‎    
-‎    .scroll-container {
-‎      scrollbar-width: none;
-‎    }
-‎    
-‎    .scroll-container::-webkit-scrollbar {
-‎      display: none;
-‎    }
-‎  </style>
-‎</head>
-‎<body class="min-h-screen pb-12">
-‎
-‎  <!-- NAVBAR -->
-‎  <nav class="fixed top-0 left-0 right-0 z-50 glass border-b border-white/10">
-‎    <div class="max-w-screen-2xl mx-auto px-8 py-5 flex items-center justify-between">
-‎      <div class="flex items-center gap-10">
-‎        <div class="flex items-center gap-3">
-‎          <div class="w-9 h-9 bg-rose-600 rounded-2xl flex items-center justify-center text-white font-bold text-2xl">M</div>
-‎          <h1 class="text-3xl font-bold tracking-tighter">MovieHub</h1>
-‎        </div>
-‎        
-‎        <div class="hidden md:flex items-center gap-8 text-sm font-medium">
-‎          <a href="#" class="hover:text-rose-400 transition-colors">Trending</a>
-‎          <a href="#" class="hover:text-rose-400 transition-colors">Popular</a>
-‎          <a href="#" class="hover:text-rose-400 transition-colors">Top Rated</a>
-‎          <a href="#" class="hover:text-rose-400 transition-colors">Upcoming</a>
-‎        </div>
-‎      </div>
-‎
-‎      <!-- Search -->
-‎      <div class="flex-1 max-w-xl mx-8">
-‎        <div class="relative">
-‎          <input 
-‎            id="searchInput"
-‎            type="text" 
-‎            placeholder="Search movies, actors, genres..." 
-‎            class="w-full bg-white/10 border border-white/20 rounded-3xl py-3 pl-12 pr-6 text-sm focus:outline-none focus:border-rose-500 transition-all placeholder:text-gray-400">
-‎          <i class="fa-solid fa-magnifying-glass absolute left-5 top-3.5 text-gray-400"></i>
-‎        </div>
-‎      </div>
-‎
-‎      <div class="flex items-center gap-6">
-‎        <button class="text-gray-400 hover:text-white transition-colors">
-‎          <i class="fa-solid fa-bell text-xl"></i>
-‎        </button>
-‎        <div class="w-9 h-9 bg-gradient-to-br from-rose-500 to-purple-600 rounded-2xl flex items-center justify-center text-sm font-semibold">AN</div>
-‎      </div>
-‎    </div>
-‎  </nav>
-‎
-‎  <!-- HERO -->
-‎  <div class="hero flex items-end pb-16">
-‎    <div class="max-w-screen-2xl mx-auto px-8 w-full">
-‎      <div class="max-w-lg">
-‎        <div class="inline-flex items-center gap-2 bg-white/10 text-xs tracking-widest px-4 py-2 rounded-3xl mb-4">
-‎          <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-‎          TRENDING #1 THIS WEEK
-‎        </div>
-‎        <h2 id="heroTitle" class="text-6xl font-bold leading-none mb-4">Dune: Part Two</h2>
-‎        <p id="heroDesc" class="text-gray-300 mb-6 line-clamp-3">
-‎          Paul Atreides unites with Chani and the Fremen while seeking revenge against conspirators who destroyed his family.
-‎        </p>
-‎        
-‎        <div class="flex items-center gap-4">
-‎          <button onclick="watchTrailer()" 
-‎                  class="bg-white text-black font-semibold px-8 py-3.5 rounded-3xl flex items-center gap-3 hover:bg-gray-200 transition-all">
-‎            <i class="fa-solid fa-play"></i>
-‎            Watch Trailer
-‎          </button>
-‎          <button class="glass border border-white/30 font-medium px-6 py-3.5 rounded-3xl flex items-center gap-3 hover:bg-white/10 transition-all">
-‎            <i class="fa-solid fa-plus"></i>
-‎            Add to List
-‎          </button>
-‎        </div>
-‎      </div>
-‎    </div>
-‎  </div>
-‎
-‎  <!-- MAIN CONTENT -->
-‎  <div class="max-w-screen-2xl mx-auto px-8 pt-10">
-‎    
-‎    <!-- TRENDING -->
-‎    <div class="mb-16">
-‎      <div class="flex items-end justify-between mb-8">
-‎        <h2 class="section-title text-3xl font-semibold">Trending This Week</h2>
-‎        <a href="#" class="text-rose-400 text-sm flex items-center gap-2 hover:underline">
-‎          View all <i class="fa-solid fa-arrow-right"></i>
-‎        </a>
-‎      </div>
-‎      
-‎      <div id="movies" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-6"></div>
-‎    </div>
-‎
-‎    <!-- MORE CATEGORIES (placeholders) -->
-‎    <div class="mb-16">
-‎      <h2 class="section-title text-3xl font-semibold mb-8">Top Rated</h2>
-‎      <div id="topRated" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-6"></div>
-‎    </div>
-‎  </div>
-‎
-‎  <!-- MOVIE MODAL -->
-‎  <div id="movieModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-lg z-[100] flex items-center justify-center p-6">
-‎    <div class="max-w-4xl w-full glass rounded-3xl overflow-hidden">
-‎      <div class="relative">
-‎        <button onclick="closeModal()" 
-‎                class="absolute top-6 right-6 w-10 h-10 bg-black/50 hover:bg-black/70 rounded-full flex items-center justify-center text-xl z-10 transition-colors">
-‎          ✕
-‎        </button>
-‎        <img id="modalBackdrop" class="w-full h-80 object-cover" alt="">
-‎        
-‎        <div class="p-8">
-‎          <h3 id="modalTitle" class="text-4xl font-bold mb-2"></h3>
-‎          <div class="flex items-center gap-6 text-sm mb-6">
-‎            <div id="modalRating" class="rating flex items-center gap-1"></div>
-‎            <div id="modalYear" class="text-gray-400"></div>
-‎            <div id="modalGenres" class="text-gray-400"></div>
-‎          </div>
-‎          
-‎          <p id="modalOverview" class="text-gray-300 leading-relaxed text-[15px]"></p>
-‎          
-‎          <div class="mt-10 flex gap-4">
-‎            <button onclick="watchTrailer()" 
-‎                    class="flex-1 bg-rose-600 hover:bg-rose-700 transition-colors py-4 rounded-2xl font-semibold flex items-center justify-center gap-3">
-‎              <i class="fa-solid fa-play"></i>
-‎              Watch Now
-‎            </button>
-‎            <button class="flex-1 border border-white/30 hover:bg-white/10 py-4 rounded-2xl font-semibold transition-colors">
-‎              Add to Watchlist
-‎            </button>
-‎          </div>
-‎        </div>
-‎      </div>
-‎    </div>
-‎  </div>
-‎
-‎  <script>
-‎    const API_KEY = "2b670b583329b90bcbad43227626c5f9"; // ← Replace with your TMDB key
-‎    
-‎    const TRENDING_URL = `https://api.themoviedb.org/3/trending/movie/week?api_key=${API_KEY}`;
-‎    const TOP_RATED_URL = `https://api.themoviedb.org/3/movie/top_rated?api_key=${API_KEY}`;
-‎
-‎    async function fetchMovies(url) {
-‎      try {
-‎        const res = await fetch(url);
-‎        if (!res.ok) throw new Error("API Error");
-‎        return await res.json();
-‎      } catch (err) {
-‎        console.error(err);
-‎        return { results: [] };
-‎      }
-‎    }
-‎
-‎    function createMovieCard(movie) {
-‎      const div = document.createElement("div");
-‎      div.className = "movie-card bg-zinc-900 rounded-3xl overflow-hidden cursor-pointer";
-‎      
-‎      div.innerHTML = `
-‎        <div class="relative">
-‎          <img src="https://image.tmdb.org/t/p/w500${movie.poster_path}" 
-‎               class="w-full aspect-[2/3] object-cover" alt="${movie.title}">
-‎          <div class="rating absolute top-3 right-3 flex items-center gap-1">
-‎            <i class="fa-solid fa-star text-yellow-400 text-xs"></i>
-‎            <span>${movie.vote_average.toFixed(1)}</span>
-‎          </div>
-‎        </div>
-‎        <div class="p-5">
-‎          <h3 class="font-semibold line-clamp-2 leading-tight">${movie.title}</h3>
-‎‎<!DOCTYPE html>
-‎<html lang="en">
-‎<head>
-‎  <meta charset="UTF-8">
-‎  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-‎  <title>MovieHub • Premium</title>
-‎  
-‎  <script src="https://cdn.tailwindcss.com"></script>
-‎  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
-‎  
-‎  <style>
-‎    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-‎    
-‎    body {
-‎      font-family: 'Inter', system-ui, sans-serif;
-‎      background: #0a0a0a;
-‎      color: #f1f1f1;
-‎    }
-‎    
-‎    .hero {
-‎      background: linear-gradient(rgba(0,0,0,0.75), rgba(0,0,0,0.9)), 
-‎                  url('https://image.tmdb.org/t/p/original/8cdWjvZQUExUUTzyp4t1vYq1c2R.jpg') center/cover no-repeat;
-‎      min-height: 85vh;
-‎    }
-‎    
-‎    .movie-card {
-‎      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-‎    }
-‎    
-‎    .movie-card:hover {
-‎      transform: translateY(-10px) scale(1.05);
-‎      box-shadow: 0 20px 25px -5px rgb(225 29 72 / 0.3);
-‎    }
-‎    
-‎    .glass {
-‎      background: rgba(255,255,255,0.08);
-‎      backdrop-filter: blur(16px);
-‎    }
-‎  </style>
-‎</head>
-‎<body class="min-h-screen">
-‎
-‎  <!-- NAVBAR -->
-‎  <nav class="fixed top-0 w-full z-50 glass border-b border-white/10">
-‎    <div class="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
-‎      <div class="flex items-center gap-3">
-‎        <div class="w-8 h-8 bg-rose-600 rounded-xl flex items-center justify-center text-xl font-bold">M</div>
-‎        <h1 class="text-2xl font-bold">MovieHub</h1>
-‎      </div>
-‎      
-‎      <div class="hidden md:flex gap-8 text-sm">
-‎        <a href="#" class="hover:text-rose-400">Trending</a>
-‎        <a href="#" class="hover:text-rose-400">Popular</a>
-‎        <a href="#" class="hover:text-rose-400">Top Rated</a>
-‎      </div>
-‎
-‎      <div class="flex items-center gap-4">
-‎        <input id="searchInput" type="text" 
-‎               class="bg-white/10 border border-white/20 rounded-full px-5 py-2 text-sm w-72 focus:outline-none focus:border-rose-500"
-‎               placeholder="Search movies...">
-‎        <button class="text-gray-400 hover:text-white">
-‎          <i class="fa-solid fa-bell"></i>
-‎        </button>
-‎      </div>
-‎    </div>
-‎  </nav>
-‎
-‎  <!-- HERO -->
-‎  <div class="hero flex items-end pb-20">
-‎    <div class="max-w-7xl mx-auto px-6 text-white">
-‎      <p class="text-rose-400 text-sm tracking-widest mb-2">TRENDING #1</p>
-‎      <h1 id="heroTitle" class="text-5xl md:text-6xl font-bold mb-3">Dune: Part Two</h1>
-‎      <p id="heroDesc" class="max-w-md text-gray-300 mb-6">
-‎        Paul Atreides unites with Chani and the Fremen while seeking revenge...
-‎      </p>
-‎      <div class="flex gap-4">
-‎        <button onclick="watchTrailer()" 
-‎                class="bg-white text-black px-8 py-3 rounded-full font-semibold flex items-center gap-2 hover:bg-gray-200">
-‎          <i class="fa-solid fa-play"></i> Watch Trailer
-‎        </button>
-‎        <button class="border border-white/50 px-6 py-3 rounded-full font-medium hover:bg-white/10">
-‎          + Add to List
-‎        </button>
-‎      </div>
-‎    </div>
-‎  </div>
-‎
-‎  <!-- CONTENT -->
-‎  <div class="max-w-7xl mx-auto px-6 -mt-8 relative z-10">
-‎    
-‎    <div class="mb-12">
-‎      <div class="flex justify-between items-end mb-6">
-‎        <h2 class="text-3xl font-semibold">Trending This Week</h2>
-‎        <span class="text-rose-400 text-sm cursor-pointer">View all →</span>
-‎      </div>
-‎      <div id="trending" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6"></div>
-‎    </div>
-‎
-‎    <div>
-‎      <div class="flex justify-between items-end mb-6">
-‎        <h2 class="text-3xl font-semibold">Top Rated</h2>
-‎        <span class="text-rose-400 text-sm cursor-pointer">View all →</span>
-‎      </div>
-‎      <div id="topRated" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6"></div>
-‎    </div>
-‎  </div>
-‎
-‎  <script>
-‎    const API_KEY = "2b670b583329b90bcbad43227626c5f9";   
-‎
-‎    const TRENDING_URL = `https://api.themoviedb.org/3/trending/movie/week?api_key=${API_KEY}`;
-‎    const TOP_RATED_URL = `https://api.themoviedb.org/3/movie/top_rated?api_key=${API_KEY}`;
-‎
-‎    async function getMovies(url, containerId) {
-‎      const container = document.getElementById(containerId);
-‎      container.innerHTML = '<p class="col-span-full text-center py-12 text-gray-400">Loading...</p>';
-‎
-‎      try {
-‎        const res = await fetch(url);
-‎        const data = await res.json();
-‎
-‎        if (!data.results || data.results.length === 0) throw new Error("No results");
-‎
-‎        container.innerHTML = "";
-‎        
-‎        data.results.slice(0, 12).forEach(movie => {
-‎          const card = document.createElement('div');
-‎          card.className = "movie-card bg-zinc-900 rounded-2xl overflow-hidden cursor-pointer";
-‎          card.innerHTML = `
-‎            <img src="https://image.tmdb.org/t/p/w500${movie.poster_path}" 
-‎                 class="w-full aspect-[2/3] object-cover" alt="${movie.title}">
-‎            <div class="p-4">
-‎              <h3 class="font-semibold text-sm line-clamp-2">${movie.title}</h3>
-‎              <p class="text-xs text-gray-400 mt-1">${movie.release_date?.split('-')[0] || 'N/A'}</p>
-‎              <div class="flex items-center gap-1 text-xs mt-2">
-‎                <span class="text-yellow-400">★</span>
-‎                <span>${movie.vote_average.toFixed(1)}</span>
-‎              </div>
-‎            </div>
-‎          `;
-‎          card.onclick = () => alert(`Selected: \( {movie.title}\n\nOverview:\n \){movie.overview}`);
-‎          container.appendChild(card);
-‎        });
-‎
-‎      } catch (error) {
-‎        container.innerHTML = `<p class="col-span-full text-center py-12 text-red-400">Failed to load movies.<br>Please check your API key.</p>`;
-‎        console.error(error);
-‎      }
-‎    }
-‎
-‎    function watchTrailer() {
-‎      window.open("https://www.youtube.com/results?search_query=Dune+Part+Two+Official+Trailer", "_blank");
-‎    }
-‎
-‎    // Initialize
-‎    window.onload = () => {
-‎      if (API_KEY === "2b670b583329b90bcbad43227626c5f9") {"2b670b583329b90bcbad43227626c5f9");
-‎      }
-‎      getMovies(TRENDING_URL, "trending");
-‎      getMovies(TOP_RATED_URL, "topRated");
-‎    };
-‎  </script>
-‎</body>
-‎</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MovieHub</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+  
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    body { font-family: 'Inter', sans-serif; background: #0a0a0a; color: #ffffff; }
+    .hero { background: linear-gradient(to bottom, rgba(0,0,0,0.7), rgba(10,10,10,0.95)), url('https://image.tmdb.org/t/p/original/8cdWjvZQUExUUTzyp4t1vYq1c2R.jpg') center/cover; min-height: 85vh; display: flex; align-items: flex-end; }
+    .movie-card { transition: all 0.4s ease; }
+    .movie-card:hover { transform: scale(1.06); box-shadow: 0 20px 30px rgba(225, 29, 72, 0.3); }
+  </style>
+</head>
+<body class="min-h-screen">
+
+  <!-- NAVBAR -->
+  <nav class="fixed top-0 w-full bg-black/90 backdrop-blur-md z-50 border-b border-white/10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 bg-rose-600 rounded-2xl flex items-center justify-center text-2xl font-bold">M</div>
+        <h1 class="text-2xl sm:text-3xl font-bold">MovieHub</h1>
+      </div>
+      <div class="flex-1 max-w-md mx-4">
+        <input id="searchInput" type="text" 
+               class="w-full bg-zinc-900 border border-zinc-700 rounded-full px-5 py-3 text-sm focus:outline-none focus:border-rose-500"
+               placeholder="Search movies...">
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 pb-12 w-full">
+      <p class="text-emerald-400 text-sm font-medium mb-2">TRENDING #1 THIS WEEK</p>
+      <h1 class="text-5xl sm:text-6xl font-bold mb-4">Dune: Part Two</h1>
+      <div class="flex gap-4">
+        <button onclick="watchTrailer()" class="bg-white text-black px-8 py-4 rounded-2xl font-semibold flex items-center gap-3">
+          <i class="fa-solid fa-play"></i> Watch Trailer
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 py-10">
+    <h2 id="sectionTitle" class="text-3xl font-semibold mb-8">Trending This Week</h2>
+    <div id="moviesGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6"></div>
+  </div>
+
+  <!-- MODAL -->
+  <div id="modal" class="hidden fixed inset-0 bg-black/95 flex items-center justify-center z-[100] p-4">
+    <div class="bg-zinc-900 w-full max-w-lg rounded-3xl overflow-hidden">
+      <div class="relative">
+        <button onclick="closeModal()" class="absolute top-4 right-4 bg-black/70 hover:bg-black w-10 h-10 rounded-full text-xl z-10">✕</button>
+        <img id="modalImage" class="w-full h-72 object-cover" alt="">
+      </div>
+      <div class="p-6">
+        <h2 id="modalTitle" class="text-3xl font-bold"></h2>
+        <div id="modalInfo" class="text-gray-400 my-3"></div>
+        <p id="modalOverview" class="text-gray-300 leading-relaxed"></p>
+        
+        <div class="mt-8 grid grid-cols-2 gap-4">
+          <button onclick="watchTrailer()" 
+                  class="bg-rose-600 py-4 rounded-2xl font-medium flex items-center justify-center gap-2">
+            <i class="fa-solid fa-play"></i> Trailer
+          </button>
+          <button onclick="openLegalWatch()" 
+                  class="border border-white/40 py-4 rounded-2xl font-medium flex items-center justify-center gap-2">
+            🌐 Where to Watch
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_KEY = "2b670b583329b90bcbad43227626c5f9";
+    let currentMovie = null;
+
+    async function fetchMovies(url) {
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+        return data.results || [];
+      } catch (e) {
+        console.error(e);
+        return [];
+      }
+    }
+
+    function createCard(movie) {
+      const card = document.createElement("div");
+      card.className = "movie-card bg-zinc-900 rounded-3xl overflow-hidden cursor-pointer";
+      card.innerHTML = `
+        <img src="https://image.tmdb.org/t/p/w500${movie.poster_path}" class="w-full aspect-[2/3] object-cover">
+        <div class="p-4">
+          <h3 class="font-semibold line-clamp-2">${movie.title}</h3>
+          <div class="text-xs text-gray-400 mt-2">${movie.release_date?.split('-')[0] || ''} • ★ ${movie.vote_average?.toFixed(1)}</div>
+        </div>
+      `;
+      card.onclick = () => showModal(movie);
+      return card;
+    }
+
+    function showModal(movie) {
+      currentMovie = movie;
+      document.getElementById("modal").classList.remove("hidden");
+      document.getElementById("modalImage").src = `https://image.tmdb.org/t/p/original${movie.backdrop_path || movie.poster_path}`;
+      document.getElementById("modalTitle").textContent = movie.title;
+      document.getElementById("modalOverview").textContent = movie.overview || "No overview available.";
+      document.getElementById("modalInfo").innerHTML = `${movie.release_date ? movie.release_date.split('-')[0] : ''} • ★ ${movie.vote_average.toFixed(1)}`;
+    }
+
+    function closeModal() {
+      document.getElementById("modal").classList.add("hidden");
+    }
+
+    function watchTrailer() {
+      if (!currentMovie) return;
+      window.open(`https://www.youtube.com/results?search_query=${encodeURIComponent(currentMovie.title + " official trailer")}`, "_blank");
+    }
+
+    function openLegalWatch() {
+      if (!currentMovie) return;
+      
+      const title = encodeURIComponent(currentMovie.title);
+      
+      // Multiple reliable fallbacks
+      const links = [
+        `https://www.justwatch.com/search?q=${title}`,
+        `https://reelgood.com/search?q=${title}`,
+        `https://www.google.com/search?q=where+to+watch+${title}+Nigeria`,
+        `https://www.google.com/search?q=${title}+streaming`
+      ];
+      
+      // Try JustWatch first, then others
+      window.open(links[0], "_blank");
+    }
+
+    async function loadMovies(url, title) {
+      document.getElementById("sectionTitle").textContent = title;
+      const container = document.getElementById("moviesGrid");
+      container.innerHTML = `<p class="col-span-full text-center py-12 text-gray-400">Loading...</p>`;
+
+      const movies = await fetchMovies(url);
+      container.innerHTML = "";
+
+      movies.slice(0, 18).forEach(movie => {
+        container.appendChild(createCard(movie));
+      });
+    }
+
+    // Search
+    document.getElementById("searchInput").addEventListener("keypress", (e) => {
+      if (e.key === "Enter") {
+        const query = e.target.value.trim();
+        if (query) {
+          loadMovies(`https://api.themoviedb.org/3/search/movie?api_key=\( {API_KEY}&query= \){encodeURIComponent(query)}`, `Results for "${query}"`);
+        }
+      }
+    });
+
+    // Initialize
+    window.onload = () => {
+      loadMovies(`https://api.themoviedb.org/3/trending/movie/week?api_key=${API_KEY}`, "Trending This Week");
+    };
+  </script>
+</body>
+</html>
