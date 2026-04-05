@@ -14,13 +14,13 @@ crossorigin="anonymous"></script>
 <style>
 body { background:#000; color:white; }
 
-.scroll { display:flex; overflow-x:auto; gap:14px; }
+.scroll { display:flex; overflow-x:auto; gap:12px; }
 .scroll::-webkit-scrollbar { display:none; }
 
-.card { min-width:150px; cursor:pointer; transition:.3s; }
-.card:hover { transform:scale(1.1); }
+.card { min-width:140px; cursor:pointer; transition:.3s; }
+.card:hover { transform:scale(1.08); }
 
-.hero { height:85vh; position:relative; }
+.hero { height:80vh; position:relative; }
 
 .hero iframe {
  position:absolute;
@@ -44,6 +44,15 @@ body { background:#000; color:white; }
  z-index:100;
 }
 
+.searchPage {
+ position:fixed;
+ inset:0;
+ background:black;
+ z-index:200;
+ display:none;
+ overflow-y:auto;
+}
+
 .gridSearch {
  display:grid;
  grid-template-columns: repeat(3,1fr);
@@ -63,12 +72,16 @@ placeholder="Search movies..."
 class="bg-gray-800 px-3 py-1 rounded w-1/2">
 </nav>
 
-<!-- SEARCH PAGE (FULL PAGE) -->
-<div id="searchPage" style="display:none;" class="pt-20 px-4 min-h-screen">
-<button onclick="goHome()" class="mb-4 bg-gray-700 px-4 py-2 rounded">← Back to Home</button>
+<!-- SEARCH PAGE -->
+<div id="searchPage" class="searchPage pt-20 px-4">
 
-<h2 class="text-2xl mb-4 font-bold">Search Results</h2>
+<button onclick="closeSearch()" class="mb-4 bg-gray-700 px-4 py-2 rounded">
+← Back
+</button>
+
+<h2 class="text-2xl mb-4">Search Results</h2>
 <div id="searchResults" class="gridSearch"></div>
+
 </div>
 
 <!-- HOME -->
@@ -82,17 +95,19 @@ class="bg-gray-800 px-3 py-1 rounded w-1/2">
 <div class="absolute bottom-10 left-6 z-10">
 <h1 id="heroTitle" class="text-4xl font-bold"></h1>
 <p id="heroDesc" class="max-w-lg text-gray-300"></p>
-<button onclick="openModal(heroMovie)" class="mt-3 bg-white text-black px-4 py-2">▶ Watch Trailer</button>
+<button onclick="openModal(heroMovie)" class="mt-3 bg-white text-black px-4 py-2">
+▶ Watch Trailer
+</button>
 </div>
 </div>
 
 <div class="px-4">
 
-<h2 class="text-xl mt-6 mb-2">🔥 Top 10</h2>
-<div id="top10" class="scroll mb-6"></div>
+<h2 class="text-xl mt-4 mb-2">🔥 Top 10</h2>
+<div id="top10" class="scroll mb-4"></div>
 
 <!-- AD -->
-<div class="text-center my-6">
+<div class="text-center my-4">
 <ins class="adsbygoogle"
 style="display:block"
 data-ad-client="ca-pub-2257272049115568"
@@ -113,11 +128,10 @@ data-full-width-responsive="true"></ins>
 
 <h2 id="mTitle" class="text-xl mb-2"></h2>
 
-<div class="flex gap-3 my-3 text-xs">
+<div class="flex gap-2 my-2 text-xs">
 <span class="bg-red-600 px-2 py-1 rounded">Netflix</span>
 <span class="bg-blue-600 px-2 py-1 rounded">Prime</span>
 <span class="bg-indigo-600 px-2 py-1 rounded">Disney+</span>
-<span class="bg-purple-600 px-2 py-1 rounded">HBO</span>
 </div>
 
 <div id="trailerBox" class="mb-3"></div>
@@ -125,56 +139,65 @@ data-full-width-responsive="true"></ins>
 <p id="mDesc" class="text-gray-300"></p>
 
 <div class="flex gap-3 mt-3">
-<button onclick="playTrailer()" class="bg-white text-black px-3 py-1">▶ Watch Trailer</button>
+<button onclick="playTrailer()" class="bg-white text-black px-3 py-1">▶ Trailer</button>
 <button onclick="closeModal()" class="bg-red-600 px-3 py-1">Close</button>
 </div>
 
 </div>
 </div>
 
-<!-- PREMIUM FOOTER -->
-<footer class="bg-black text-gray-400 mt-16 px-6 py-12 border-t border-gray-800">
+<!-- PREMIUM FOOTER + FEEDBACK -->
+<footer class="bg-black text-gray-400 mt-10 px-6 py-10 border-t border-gray-800">
 
-<div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-sm">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
 
+<!-- BRAND -->
 <div>
 <h2 class="text-white font-bold mb-3">🎬 MovieHub</h2>
-<p>Stream trailers, explore trending movies, and discover entertainment worldwide.</p>
+<p>Discover movies, watch trailers and explore trending content worldwide.</p>
 </div>
 
+<!-- LINKS -->
 <div>
-<h3 class="text-white mb-3 font-semibold">Explore</h3>
+<h3 class="text-white mb-3">Quick Links</h3>
 <ul class="space-y-2">
 <li onclick="goHome()" class="cursor-pointer hover:text-white">Home</li>
 <li class="hover:text-white">Top 10</li>
-<li class="hover:text-white">New Releases</li>
-<li class="hover:text-white">Popular</li>
+<li class="hover:text-white">Categories</li>
 </ul>
 </div>
 
+<!-- FEEDBACK -->
 <div>
-<h3 class="text-white mb-3 font-semibold">Legal</h3>
-<ul class="space-y-2">
-<li>Privacy Policy</li>
-<li>Terms of Use</li>
-<li>Disclaimer</li>
-</ul>
+<h3 class="text-white mb-3">Send Feedback</h3>
+
+<form action="https://formsubmit.co/eh710214@gmail.com" method="POST" class="space-y-2">
+
+<input type="text" name="name" placeholder="Your Name"
+class="w-full px-3 py-2 bg-gray-800 rounded text-white" required>
+
+<input type="email" name="email" placeholder="Your Email"
+class="w-full px-3 py-2 bg-gray-800 rounded text-white" required>
+
+<textarea name="message" placeholder="Your feedback..."
+class="w-full px-3 py-2 bg-gray-800 rounded text-white" required></textarea>
+
+<button type="submit" class="bg-white text-black px-4 py-2 w-full">
+Send Feedback
+</button>
+
+<input type="hidden" name="_captcha" value="false">
+<input type="hidden" name="_template" value="table">
+
+</form>
+
 </div>
 
-<div>
-<h3 class="text-white mb-3 font-semibold">Contact</h3>
-<ul class="space-y-2">
-<li>Email: eh710214@gmail.com</li>
-<li>Phone: +2349049696168</li>
-<li class="hover:text-white cursor-pointer">Support</li>
-</ul>
 </div>
 
-</div>
-
-<div class="border-t border-gray-800 mt-10 pt-6 text-center text-sm">
-<p>© 2026 MovieHub. All rights reserved.</p>
-<p class="mt-2">This site does not host movies. Content belongs to respective owners.</p>
+<div class="border-t border-gray-800 mt-6 pt-4 text-center text-sm">
+<p>© 2026 MovieHub</p>
+<p>Email: eh710214@gmail.com | Phone: +2349049696168</p>
 </div>
 
 </footer>
@@ -189,28 +212,33 @@ let heroMovie=null;
 
 function goHome(){
  searchPage.style.display="none";
- homePage.style.display="block";
 }
 
-// SEARCH FULL PAGE
+function closeSearch(){
+ searchPage.style.display="none";
+}
+
+// SEARCH OPEN
+searchInput.onfocus=()=>{
+ searchPage.style.display="block";
+}
+
+// SEARCH
 searchInput.oninput=async()=>{
  const q=searchInput.value;
 
  if(q.length<2){
-  goHome();
+  searchResults.innerHTML="";
   return;
  }
 
  const res=await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${q}`);
  const data=await res.json();
 
- homePage.style.display="none";
- searchPage.style.display="block";
-
  searchResults.innerHTML=data.results.map(m=>`
  <div class="card">
  <img src="https://image.tmdb.org/t/p/w300${m.poster_path}">
- <p class="text-sm mt-1">${m.title}</p>
+ <p class="text-sm">${m.title}</p>
  </div>`).join("");
 
  document.querySelectorAll("#searchResults .card").forEach((c,i)=>{
@@ -246,7 +274,6 @@ async function openModal(m){
 
  currentTrailer=await getTrailer(m.id);
  trailerBox.innerHTML="";
-
  modal.style.display="flex";
 }
 
@@ -255,13 +282,19 @@ function playTrailer(){
 
  trailerBox.innerHTML=`
  <iframe width="100%" height="200"
- src="https://www.youtube.com/embed/${currentTrailer}?autoplay=1"
- frameborder="0"></iframe>`;
+ src="https://www.youtube.com/embed/${currentTrailer}?autoplay=1"></iframe>`;
 }
 
 function closeModal(){
  modal.style.display="none";
  trailerBox.innerHTML="";
+}
+
+// CARD
+function card(m){
+ return `<div class="card">
+ <img src="https://image.tmdb.org/t/p/w300${m.poster_path}">
+ </div>`;
 }
 
 // LOAD
@@ -271,16 +304,23 @@ async function load(){
 
  setHero(trending.results[0]);
 
- top10.innerHTML=trending.results.slice(0,10).map(m=>`
- <div class="card" onclick='openModal(${JSON.stringify(m)})'>
- <img src="https://image.tmdb.org/t/p/w300${m.poster_path}">
- </div>`).join("");
+ top10.innerHTML=trending.results.slice(0,10).map(card).join("");
+
+ document.querySelectorAll("#top10 .card").forEach((c,i)=>{
+  c.onclick=()=>openModal(trending.results[i]);
+ });
 
  const genres=[
  ["Action",28],
  ["Comedy",35],
  ["Horror",27],
- ["Sci-Fi",878]
+ ["Sci-Fi",878],
+ ["Romance",10749],
+ ["Drama",18],
+ ["Animation",16],
+ ["Thriller",53],
+ ["Crime",80],
+ ["Adventure",12]
  ];
 
  for(const [name,id] of genres){
@@ -289,13 +329,13 @@ async function load(){
   const data=await res.json();
 
   rows.innerHTML+=`
-  <h2 class="mt-6">${name}</h2>
-  <div class="scroll">
-  ${data.results.map(m=>`
-   <div class="card" onclick='openModal(${JSON.stringify(m)})'>
-   <img src="https://image.tmdb.org/t/p/w300${m.poster_path}">
-   </div>`).join("")}
+  <h2 class="mt-4">${name}</h2>
+  <div class="scroll mb-4">
+  ${data.results.map(card).join("")}
   </div>`;
+
+  const cards=rows.lastElementChild.querySelectorAll(".card");
+  cards.forEach((c,i)=>c.onclick=()=>openModal(data.results[i]));
  }
 
 }
