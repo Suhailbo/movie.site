@@ -70,7 +70,7 @@ body { background:#0a0a0a; color:white; font-family:sans-serif; }
   discover new releases, and find your next favorite content easily.
   </p>
   <p class="mt-2">
-  We aim to provide a smooth and enjoyable browsing experience for movie lovers around the world.
+  We aim to provide a smooth and enjoyable browsing experience for movie lovers worldwide.
   </p>
 </div>
 
@@ -103,6 +103,20 @@ body { background:#0a0a0a; color:white; font-family:sans-serif; }
   </div>
 </div>
 
+<!-- SEARCH -->
+<div id="searchPage" class="hidden fixed inset-0 bg-black p-6 z-50 overflow-auto">
+  <button onclick="closeSearchPage()" class="text-2xl mb-4">←</button>
+  <input id="searchInputFull" class="w-full p-3 mb-6 bg-zinc-800 rounded text-lg" placeholder="Search movies...">
+  <div id="searchResults" class="grid grid-cols-2 md:grid-cols-5 gap-4"></div>
+</div>
+
+<!-- WATCHLIST -->
+<div id="watchlistPage" class="hidden fixed inset-0 bg-black p-6 z-50 overflow-auto">
+  <button onclick="closeWatchlist()" class="text-2xl mb-4">←</button>
+  <h1 class="text-2xl mb-4">My Watchlist</h1>
+  <div id="watchlistGrid" class="grid grid-cols-2 md:grid-cols-5 gap-4"></div>
+</div>
+
 <!-- INFO PAGE -->
 <div id="infoPage" class="hidden fixed inset-0 bg-black p-8 z-50 overflow-auto">
   <button onclick="closeInfoPage()" class="text-2xl mb-6">← Back</button>
@@ -122,9 +136,17 @@ const API_KEY="2b670b583329b90bcbad43227626c5f9";
 let currentMovie=null;
 let watchlist=JSON.parse(localStorage.getItem("watchlist")||"[]");
 
-const rowsData=[
-{title:"Trending",url:`https://api.themoviedb.org/3/trending/all/week?api_key=${API_KEY}`},
-{title:"Top Rated",url:`https://api.themoviedb.org/3/movie/top_rated?api_key=${API_KEY}`}
+const rowsData = [
+{ title:"🔥 Trending", url:`https://api.themoviedb.org/3/trending/all/week?api_key=${API_KEY}` },
+{ title:"⭐ Top Rated", url:`https://api.themoviedb.org/3/movie/top_rated?api_key=${API_KEY}` },
+{ title:"🎬 Popular Movies", url:`https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}` },
+{ title:"📺 TV Shows", url:`https://api.themoviedb.org/3/tv/popular?api_key=${API_KEY}` },
+{ title:"💥 Action", url:`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=28` },
+{ title:"👻 Horror", url:`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=27` },
+{ title:"🚀 Sci-Fi", url:`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=878` },
+{ title:"🎌 Anime", url:`https://api.themoviedb.org/3/discover/tv?api_key=${API_KEY}&with_keywords=210024` },
+{ title:"🇰🇷 K-Drama", url:`https://api.themoviedb.org/3/discover/tv?api_key=${API_KEY}&with_origin_country=KR` },
+{ title:"🇮🇳 Bollywood", url:`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_origin_country=IN` }
 ];
 
 async function fetchMovies(url){
@@ -159,7 +181,7 @@ async function loadRows(){
       card.onclick=()=>showDetails(movies[i]);
     });
 
-    if(row.title==="Trending" && movies.length>0){
+    if(row.title.includes("Trending") && movies.length>0){
       setHero(movies[0]);
     }
   }
@@ -191,8 +213,44 @@ function toggleWatchlist(movie){
   const exist=watchlist.find(m=>m.id===movie.id);
   if(exist) watchlist=watchlist.filter(m=>m.id!==movie.id);
   else watchlist.push(movie);
-
   localStorage.setItem("watchlist",JSON.stringify(watchlist));
+}
+
+function openSearchPage(){
+  mainPage.classList.add("hidden");
+  searchPage.classList.remove("hidden");
+}
+
+function closeSearchPage(){
+  searchPage.classList.add("hidden");
+  mainPage.classList.remove("hidden");
+}
+
+searchInputFull.addEventListener("input",async e=>{
+  const q=e.target.value.trim();
+  if(q.length<3) return;
+
+  const res=await fetchMovies(`https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(q)}`);
+  searchResults.innerHTML=res.map(createCard).join('');
+
+  searchResults.querySelectorAll(".movie-card").forEach((card,i)=>{
+    card.onclick=()=>showDetails(res[i]);
+  });
+});
+
+function openWatchlist(){
+  mainPage.classList.add("hidden");
+  watchlistPage.classList.remove("hidden");
+
+  watchlistGrid.innerHTML=watchlist.map(createCard).join('');
+  watchlistGrid.querySelectorAll(".movie-card").forEach((card,i)=>{
+    card.onclick=()=>showDetails(watchlist[i]);
+  });
+}
+
+function closeWatchlist(){
+  watchlistPage.classList.add("hidden");
+  mainPage.classList.remove("hidden");
 }
 
 function openPage(type){
@@ -202,7 +260,8 @@ function openPage(type){
   if(type==="about"){
     infoContent.innerHTML=`
     <h1 class="text-3xl mb-6 font-bold">About MovieHub</h1>
-    <p>MovieHub is a platform to discover movies, trailers, and trending entertainment content worldwide.</p>`;
+    <p class="mb-4">MovieHub helps users discover trending movies, anime, and TV shows worldwide.</p>
+    <p class="mb-4">We do not host movies. We provide trailers and information only.</p>`;
   }
 
   if(type==="contact"){
@@ -214,7 +273,8 @@ function openPage(type){
   if(type==="privacy"){
     infoContent.innerHTML=`
     <h1 class="text-3xl mb-6 font-bold">Privacy Policy</h1>
-    <p>We do not collect personal data. Ads may use cookies for better experience.</p>`;
+    <p class="mb-4">We respect your privacy and do not collect personal data.</p>
+    <p class="mb-4">Ads may use cookies to improve experience.</p>`;
   }
 }
 
@@ -229,7 +289,7 @@ async function playTrailerFromDetails(){
   const data=await res.json();
 
   const vid=data.results.find(v=>v.type==="Trailer")||data.results[0];
-  if(!vid)return alert("No trailer available");
+  if(!vid) return alert("No trailer available");
 
   trailerFrame.src=`https://www.youtube.com/embed/${vid.key}?autoplay=1`;
   trailerModal.classList.remove("hidden");
