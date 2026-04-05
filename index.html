@@ -51,7 +51,7 @@
 ‎<div class="movies" id="movies"></div>
 ‎
 ‎<script>
-‎const API_KEY = 37e39b166ef8c28d27abbe1e66cce807;
+‎const API_KEY = "2b670b583329b90bcbad43227626c5f9";
 ‎
 ‎const URL = "https://api.themoviedb.org/3/trending/movie/week?api_key=" + API_KEY;
 ‎
@@ -62,10 +62,37 @@
 ‎
 ‎    const moviesContainer = document.getElementById("movies");
 ‎
+‎    if (!data.results) {
+‎      moviesContainer.innerHTML = "<p>Failed to load movies. Check API key.</p>";
+‎      return;
+‎    }
+‎
 ‎    data.results.forEach(movie => {
 ‎      const div = document.createElement("div");
 ‎      div.classList.add("movie");
 ‎
+‎      div.innerHTML = `
+‎        <img src="https://image.tmdb.org/t/p/w500${movie.poster_path}">
+‎        <div class="info">
+‎          <h3>${movie.title}</h3>
+‎          <p>⭐ ${movie.vote_average}</p>
+‎        </div>
+‎      `;
+‎
+‎      moviesContainer.appendChild(div);
+‎    });
+‎
+‎  } catch (error) {
+‎    document.body.innerHTML += "<p>Error loading movies</p>";
+‎    console.error(error);
+‎  }
+‎}
+‎
+‎getMovies();
+‎</script>
+‎
+‎</body>
+‎</html>‎
 ‎      div.innerHTML = `
 ‎        <img src="https://image.tmdb.org/t/p/w500${movie.poster_path}">
 ‎        <div class="info">
