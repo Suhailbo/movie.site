@@ -41,7 +41,7 @@ body { background:#000; color:white; }
 
 <body>
 
-<!-- NAV (FIXED ISSUE HERE) -->
+<!-- NAV -->
 <nav class="sticky top-0 backdrop-blur bg-black/70 flex justify-between p-4 z-50">
 <h1 onclick="goHome()" class="font-bold cursor-pointer">🎬 MovieHub</h1>
 
@@ -50,7 +50,7 @@ placeholder="Search movies..."
 class="bg-gray-900 border border-gray-600 px-4 py-2 rounded w-1/2 text-white">
 </nav>
 
-<!-- SEARCH PAGE -->
+<!-- SEARCH -->
 <div id="searchPage" class="searchPage pt-20 px-4">
 <button onclick="closeSearch()" class="mb-4 bg-gray-700 px-4 py-2 rounded">← Back</button>
 
@@ -58,7 +58,7 @@ class="bg-gray-900 border border-gray-600 px-4 py-2 rounded w-1/2 text-white">
 placeholder="Search movies..."
 class="w-full bg-gray-900 border border-gray-600 px-4 py-3 rounded text-white mb-4">
 
-<div id="searchResults" class="space-y-4"></div>
+<div id="searchResults"></div>
 </div>
 
 <!-- MOVIE PAGE -->
@@ -69,6 +69,12 @@ class="w-full bg-gray-900 border border-gray-600 px-4 py-3 rounded text-white mb
 
 <h2 class="mt-6 text-xl">🤖 Recommended</h2>
 <div id="recommendations" class="scroll mt-3"></div>
+</div>
+
+<!-- EXTRA PAGES -->
+<div id="extraPage" class="searchPage pt-20 px-6">
+<button onclick="closeExtraPage()" class="mb-4 bg-gray-700 px-4 py-2 rounded">← Back</button>
+<div id="extraContent" class="max-w-3xl mx-auto text-gray-300"></div>
 </div>
 
 <!-- HOME -->
@@ -95,36 +101,34 @@ class="w-full bg-gray-900 border border-gray-600 px-4 py-3 rounded text-white mb
 </div>
 </div>
 
-<!-- PREMIUM FOOTER -->
+<!-- FOOTER -->
 <footer class="bg-black border-t border-gray-800 mt-10 px-6 py-10">
 
 <div class="grid md:grid-cols-3 gap-8">
 
 <div>
 <h2 class="text-white font-bold text-lg mb-3">🎬 MovieHub</h2>
-<p class="text-gray-400">Stream trailers, discover movies, and explore content worldwide.</p>
+<p class="text-gray-400">Discover movies, trailers & streaming platforms.</p>
 </div>
 
 <div>
-<h3 class="text-white mb-3">Explore</h3>
+<h3 class="text-white mb-3">Links</h3>
 <ul class="space-y-2 text-gray-400">
-<li>Home</li>
-<li>Top Movies</li>
-<li>Categories</li>
-<li>Trending</li>
+<li onclick="goHome()">Home</li>
+<li onclick="openPage('policy')">Privacy Policy</li>
+<li onclick="openPage('terms')">Terms & Conditions</li>
+<li onclick="openPage('contact')">Contact</li>
 </ul>
 </div>
 
 <div>
-<h3 class="text-white mb-3">Send Feedback</h3>
+<h3 class="text-white mb-3">Feedback</h3>
 
 <form action="https://formsubmit.co/eh710214@gmail.com" method="POST">
 <input type="text" name="name" placeholder="Name" class="w-full mb-2 bg-gray-800 p-2 rounded">
 <input type="email" name="email" placeholder="Email" class="w-full mb-2 bg-gray-800 p-2 rounded">
-<textarea name="message" placeholder="Your feedback..." class="w-full mb-2 bg-gray-800 p-2 rounded"></textarea>
-
+<textarea name="message" placeholder="Feedback" class="w-full mb-2 bg-gray-800 p-2 rounded"></textarea>
 <button class="bg-white text-black px-4 py-2 w-full rounded">Send</button>
-
 <input type="hidden" name="_captcha" value="false">
 </form>
 
@@ -133,7 +137,7 @@ class="w-full bg-gray-900 border border-gray-600 px-4 py-3 rounded text-white mb
 </div>
 
 <div class="text-center text-gray-500 mt-6 text-sm">
-© 2026 MovieHub | +2349049696168
+© 2026 MovieHub
 </div>
 
 </footer>
@@ -141,7 +145,6 @@ class="w-full bg-gray-900 border border-gray-600 px-4 py-3 rounded text-white mb
 <script>
 
 const API_KEY="2b670b583329b90bcbad43227626c5f9";
-
 let heroMovie;
 
 // SEARCH
@@ -196,7 +199,7 @@ async function getProviders(id){
  return d.results?.NG?.flatrate || [];
 }
 
-// RECOMMENDATIONS (AI-LIKE)
+// RECOMMENDATIONS
 async function getRecommendations(id){
  const r=await fetch(`https://api.themoviedb.org/3/movie/${id}/recommendations?api_key=${API_KEY}`);
  const d=await r.json();
@@ -215,6 +218,7 @@ async function openMovie(m){
 
  const hasNetflix = providers.some(p=>p.provider_name==="Netflix");
  const hasPrime = providers.some(p=>p.provider_name==="Amazon Prime Video");
+ const hasDisney = providers.some(p=>p.provider_name==="Disney Plus");
 
  movieDetails.innerHTML=`
  <div class="flex flex-col md:flex-row gap-6">
@@ -226,7 +230,7 @@ async function openMovie(m){
  <p class="text-yellow-400">⭐ ${m.vote_average}</p>
  <p class="text-gray-300 my-3">${m.overview||""}</p>
 
- <div class="flex gap-3 mb-4">
+ <div class="flex gap-3 mb-4 flex-wrap">
 
  <button class="${hasNetflix ? 'bg-red-600' : 'bg-gray-600 opacity-50'} px-4 py-2 rounded">
  ${hasNetflix ? 'Watch on Netflix' : 'Not on Netflix'}
@@ -234,6 +238,10 @@ async function openMovie(m){
 
  <button class="${hasPrime ? 'bg-blue-600' : 'bg-gray-600 opacity-50'} px-4 py-2 rounded">
  ${hasPrime ? 'Watch on Prime' : 'Not on Prime'}
+ </button>
+
+ <button class="${hasDisney ? 'bg-indigo-600' : 'bg-gray-600 opacity-50'} px-4 py-2 rounded">
+ ${hasDisney ? 'Watch on Disney+' : 'Not on Disney+'}
  </button>
 
  </div>
@@ -248,7 +256,6 @@ async function openMovie(m){
  </div>
  `;
 
- // RECOMMENDATIONS
  recommendations.innerHTML=recs.map(r=>`
  <div class="card" onclick='openMovie(${JSON.stringify(r)})'>
  <img src="https://image.tmdb.org/t/p/w300${r.poster_path}">
@@ -265,12 +272,38 @@ function closeMoviePage(){
  moviePage.style.display="none";
 }
 
+// LEGAL PAGES
+function openPage(type){
+
+ extraPage.style.display="block";
+
+ if(type==="policy"){
+  extraContent.innerHTML=`<h1 class="text-3xl mb-4">Privacy Policy</h1>
+  <p>This site uses TMDB API and Google AdSense...</p>`;
+ }
+
+ if(type==="terms"){
+  extraContent.innerHTML=`<h1 class="text-3xl mb-4">Terms & Conditions</h1>
+  <p>We do not host movies. We provide discovery only...</p>`;
+ }
+
+ if(type==="contact"){
+  extraContent.innerHTML=`<h1 class="text-3xl mb-4">Contact</h1>
+  <p>Email: eh710214@gmail.com</p>`;
+ }
+}
+
+function closeExtraPage(){
+ extraPage.style.display="none";
+}
+
 // LOAD
 async function load(){
 
  const trending=await fetch(`https://api.themoviedb.org/3/trending/movie/week?api_key=${API_KEY}`).then(r=>r.json());
 
- heroMovie=trending.results[0];
+ heroMovie=trending.results[Math.floor(Math.random()*trending.results.length)];
+
  heroTitle.innerText=heroMovie.title;
  heroDesc.innerText=heroMovie.overview;
 
