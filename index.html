@@ -52,12 +52,6 @@ body { background:#000; color:white; }
  display:none;
  overflow-y:auto;
 }
-
-.gridSearch {
- display:grid;
- grid-template-columns: repeat(3,1fr);
- gap:12px;
-}
 </style>
 </head>
 
@@ -80,7 +74,8 @@ class="bg-gray-800 px-3 py-1 rounded w-1/2">
 </button>
 
 <h2 class="text-2xl mb-4">Search Results</h2>
-<div id="searchResults" class="gridSearch"></div>
+
+<div id="searchResults" class="space-y-4"></div>
 
 </div>
 
@@ -146,28 +141,25 @@ data-full-width-responsive="true"></ins>
 </div>
 </div>
 
-<!-- PREMIUM FOOTER + FEEDBACK -->
+<!-- FOOTER + FEEDBACK -->
 <footer class="bg-black text-gray-400 mt-10 px-6 py-10 border-t border-gray-800">
 
 <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
 
-<!-- BRAND -->
 <div>
 <h2 class="text-white font-bold mb-3">🎬 MovieHub</h2>
 <p>Discover movies, watch trailers and explore trending content worldwide.</p>
 </div>
 
-<!-- LINKS -->
 <div>
 <h3 class="text-white mb-3">Quick Links</h3>
 <ul class="space-y-2">
 <li onclick="goHome()" class="cursor-pointer hover:text-white">Home</li>
-<li class="hover:text-white">Top 10</li>
-<li class="hover:text-white">Categories</li>
+<li>Top 10</li>
+<li>Categories</li>
 </ul>
 </div>
 
-<!-- FEEDBACK -->
 <div>
 <h3 class="text-white mb-3">Send Feedback</h3>
 
@@ -216,35 +208,41 @@ function goHome(){
 
 function closeSearch(){
  searchPage.style.display="none";
+ searchInput.value="";
+ searchResults.innerHTML="";
 }
 
-// SEARCH OPEN
-searchInput.onfocus=()=>{
+// OPEN SEARCH
+searchInput.addEventListener("focus", ()=>{
  searchPage.style.display="block";
-}
+});
 
 // SEARCH
-searchInput.oninput=async()=>{
- const q=searchInput.value;
+searchInput.addEventListener("input", async ()=>{
+ const q = searchInput.value;
 
- if(q.length<2){
+ if(q.length < 2){
   searchResults.innerHTML="";
   return;
  }
 
- const res=await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${q}`);
- const data=await res.json();
+ const res = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${q}`);
+ const data = await res.json();
 
- searchResults.innerHTML=data.results.map(m=>`
- <div class="card">
- <img src="https://image.tmdb.org/t/p/w300${m.poster_path}">
- <p class="text-sm">${m.title}</p>
- </div>`).join("");
+ searchResults.innerHTML = data.results.map(m => `
+  <div class="flex gap-4 bg-gray-900 p-3 rounded cursor-pointer hover:bg-gray-800">
+    <img src="https://image.tmdb.org/t/p/w200${m.poster_path}" class="w-24 rounded">
+    <div>
+      <h3 class="text-lg font-bold">${m.title}</h3>
+      <p class="text-sm text-gray-400">${m.overview || "No description available"}</p>
+    </div>
+  </div>
+ `).join("");
 
- document.querySelectorAll("#searchResults .card").forEach((c,i)=>{
-  c.onclick=()=>openModal(data.results[i]);
+ document.querySelectorAll("#searchResults > div").forEach((el,i)=>{
+  el.onclick=()=>openModal(data.results[i]);
  });
-};
+});
 
 // TRAILER
 async function getTrailer(id){
