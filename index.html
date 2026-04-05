@@ -1,220 +1,588 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>MovieHub</title>
 
 <script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/js/all.min.js" crossorigin="anonymous"></script>
 
 <!-- AdSense -->
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2257272049115568"
 crossorigin="anonymous"></script>
 
 <style>
-body { background:#0a0a0a; color:white; font-family:sans-serif; }
-.scroll { display:flex; overflow-x:auto; gap:16px; }
-.scroll::-webkit-scrollbar { display:none; }
+  body { background:#0a0a0a; color:white; font-family:sans-serif; }
+  .scroll { display:flex; overflow-x:auto; gap:20px; padding-bottom:8px; }
+  .scroll::-webkit-scrollbar { display:none; }
 
-.movie-card { min-width:140px; cursor:pointer; transition:0.3s; }
-.movie-card:hover { transform:scale(1.08); }
+  .movie-card {
+    min-width:160px;
+    cursor:pointer;
+    transition:transform .25s ease;
+  }
+  .movie-card:hover { transform:scale(1.06); }
 
-.hero {
- height:65vh;
- display:flex;
- align-items:flex-end;
- padding:30px;
- background-size:cover;
- background-position:center;
-}
+  .hero {
+    height:70vh;
+    display:flex;
+    align-items:flex-end;
+    padding:40px;
+    background-size:cover;
+    background-position:center;
+    position:relative;
+  }
+
+  .hero::after {
+    content:"";
+    position:absolute;
+    inset:0;
+    background:linear-gradient(to top, rgba(0,0,0,.9), rgba(0,0,0,.25), rgba(0,0,0,.1));
+    pointer-events:none;
+  }
+
+  .hero > div {
+    position:relative;
+    z-index:1;
+    max-width:900px;
+  }
 </style>
 </head>
 
 <body>
 
 <!-- NAV -->
-<nav class="fixed top-0 w-full bg-black/90 p-4 flex justify-between z-50">
-<h1 class="text-2xl font-bold">🎬 MovieHub</h1>
-<div class="flex gap-4">
-<span onclick="openSearchPage()" class="cursor-pointer">Search</span>
-<span onclick="openWatchlist()" class="cursor-pointer">❤️</span>
-</div>
+<nav class="fixed top-0 w-full bg-black/90 backdrop-blur-md p-4 flex items-center justify-between z-50 border-b border-white/10">
+  <h1 class="text-3xl font-bold">🎬 MovieHub</h1>
+
+  <div class="flex items-center gap-4 text-sm sm:text-base">
+    <button onclick="openSearchPage()" class="flex items-center gap-2 hover:text-rose-400">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <span class="hidden sm:inline">Search</span>
+    </button>
+    <button onclick="openWatchlist()" class="hover:text-rose-400">❤️ Watchlist</button>
+  </div>
 </nav>
 
 <!-- MAIN -->
-<div id="mainPage" class="pt-16">
+<div id="mainPage" class="pt-20">
 
-<!-- HERO -->
-<div id="hero" class="hero">
-<div>
-<h1 id="heroTitle" class="text-3xl font-bold mb-3"></h1>
-<button onclick="playHeroTrailer()" class="bg-white text-black px-4 py-2 rounded">
-▶ Trailer
-</button>
+  <!-- HERO -->
+  <div id="hero" class="hero">
+    <div>
+      <h1 id="heroTitle" class="text-4xl sm:text-5xl font-bold mb-4 leading-tight"></h1>
+      <button onclick="playHeroTrailer()" class="bg-white text-black px-6 py-3 rounded-xl font-semibold">
+        ▶ Watch Trailer
+      </button>
+    </div>
+  </div>
+
+  <!-- INTRO -->
+  <div class="px-4 sm:px-6 py-6 text-gray-300 max-w-4xl">
+    <h2 class="text-2xl sm:text-3xl font-bold mb-3">Discover Movies & Series</h2>
+    <p class="text-lg leading-relaxed">
+      MovieHub helps you explore trending movies, TV shows, anime, K-dramas, Bollywood, and more.
+      Watch trailers, discover new releases, save favorites, and keep track of what you want to watch next.
+    </p>
+  </div>
+
+  <!-- ADS -->
+  <div class="px-4 sm:px-6 my-4">
+    <div class="flex justify-center">
+      <ins class="adsbygoogle"
+           style="display:block"
+           data-ad-client="ca-pub-2257272049115568"
+           data-ad-slot="1234567890"
+           data-ad-format="auto"
+           data-full-width-responsive="true"></ins>
+    </div>
+    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+  </div>
+
+  <!-- ROWS -->
+  <div id="rows" class="px-4 sm:px-6"></div>
+
+  <!-- FOOTER -->
+  <footer class="mt-16 p-8 border-t border-gray-800 text-gray-300">
+    <div class="grid md:grid-cols-4 gap-6 text-base sm:text-lg">
+      <div>
+        <h3 class="font-bold text-white mb-2">MovieHub</h3>
+        <p>Discover movies, trailers, anime, and more.</p>
+      </div>
+
+      <div>
+        <h3 class="font-bold text-white mb-2">Pages</h3>
+        <p onclick="openPage('about')" class="cursor-pointer hover:underline">About</p>
+        <p onclick="openPage('contact')" class="cursor-pointer hover:underline">Contact</p>
+        <p onclick="openPage('privacy')" class="cursor-pointer hover:underline">Privacy Policy</p>
+        <p onclick="openPage('terms')" class="cursor-pointer hover:underline">Terms of Use</p>
+      </div>
+
+      <div>
+        <h3 class="font-bold text-white mb-2">Contact</h3>
+        <p>Email: eh710214@gmail.com</p>
+        <p>Phone: +2349049696168</p>
+      </div>
+
+      <div>
+        <h3 class="font-bold text-white mb-2">Disclaimer</h3>
+        <p>We do not host movies. All content belongs to their respective owners.</p>
+      </div>
+    </div>
+    <p class="text-center mt-8 text-sm">© 2026 MovieHub</p>
+  </footer>
 </div>
-</div>
 
-<div id="rows" class="px-4"></div>
-
-</div>
-
-<!-- SEARCH -->
-<div id="searchPage" class="hidden fixed inset-0 bg-black p-4 z-50 overflow-auto">
-<button onclick="closeSearchPage()">← Back</button>
-<input id="searchInputFull" class="w-full p-3 bg-zinc-800 mt-4 rounded" placeholder="Search movies...">
-<div id="searchResults" class="grid grid-cols-3 gap-3 mt-6"></div>
+<!-- INFO PAGE -->
+<div id="infoPage" class="hidden fixed inset-0 bg-black p-6 z-50 overflow-auto">
+  <button onclick="closeInfoPage()" class="text-2xl mb-6">← Back</button>
+  <div id="infoContent" class="text-lg leading-relaxed max-w-4xl"></div>
 </div>
 
 <!-- DETAILS -->
-<div id="detailsPage" class="hidden fixed inset-0 bg-black p-4 z-50 overflow-auto">
-<button onclick="closeDetailsPage()">←</button>
-<img id="detailsPoster" class="w-40 my-4">
-<h1 id="detailsTitle" class="text-xl font-bold"></h1>
-<p id="detailsOverview" class="text-gray-400 text-sm"></p>
+<div id="detailsPage" class="hidden fixed inset-0 bg-black p-6 z-50 overflow-auto">
+  <button onclick="closeDetailsPage()" class="text-2xl mb-4">← Back</button>
+  <img id="detailsPoster" class="w-56 sm:w-64 rounded my-6">
+  <h1 id="detailsTitle" class="text-3xl font-bold mb-3"></h1>
+  <p id="detailsOverview" class="text-gray-400 text-lg leading-relaxed max-w-4xl"></p>
 
-<div class="flex gap-3 mt-4">
-<button onclick="addToWatchlist()" class="bg-green-600 px-3 py-1">+ Save</button>
-<button onclick="playTrailer()" class="bg-red-600 px-3 py-1">Trailer</button>
+  <!-- DETAILS AD -->
+  <div class="my-6">
+    <div class="flex justify-center">
+      <ins class="adsbygoogle"
+           style="display:block"
+           data-ad-client="ca-pub-2257272049115568"
+           data-ad-slot="1234567890"
+           data-ad-format="auto"
+           data-full-width-responsive="true"></ins>
+    </div>
+    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+  </div>
+
+  <div class="flex flex-wrap gap-4 mt-6">
+    <button id="watchlistBtn" onclick="toggleWatchlist()" class="bg-emerald-600 px-5 py-3 rounded font-semibold">
+      + Watchlist
+    </button>
+    <button onclick="playTrailerFromDetails()" class="bg-red-600 px-5 py-3 rounded font-semibold">
+      ▶ Trailer
+    </button>
+    <button onclick="openPlatform('netflix')" class="bg-white text-black px-5 py-3 rounded font-semibold">
+      Netflix
+    </button>
+    <button onclick="openPlatform('prime')" class="bg-yellow-500 text-black px-5 py-3 rounded font-semibold">
+      Prime
+    </button>
+    <button onclick="openPlatform('disney')" class="bg-blue-500 px-5 py-3 rounded font-semibold">
+      Disney+
+    </button>
+    <button onclick="openPlatform('google')" class="bg-gray-700 px-5 py-3 rounded font-semibold">
+      Search
+    </button>
+  </div>
 </div>
+
+<!-- SEARCH -->
+<div id="searchPage" class="hidden fixed inset-0 bg-black p-4 sm:p-6 z-50 overflow-auto">
+  <div class="flex items-center gap-3 mb-4">
+    <button onclick="closeSearchPage()" class="text-2xl">←</button>
+    <input id="searchInputFull"
+      class="w-full p-4 bg-zinc-900 rounded-xl outline-none text-base sm:text-lg"
+      placeholder="Search movies, shows...">
+  </div>
+
+  <p id="searchStatus" class="mt-2 text-gray-400"></p>
+  <div id="searchResults" class="grid grid-cols-3 gap-3 mt-6 sm:grid-cols-4 md:grid-cols-5"></div>
 </div>
 
 <!-- WATCHLIST -->
-<div id="watchlistPage" class="hidden fixed inset-0 bg-black p-4 z-50">
-<button onclick="closeWatchlist()">←</button>
-<div id="watchlistGrid" class="grid grid-cols-3 gap-3"></div>
+<div id="watchlistPage" class="hidden fixed inset-0 bg-black p-4 sm:p-6 z-50 overflow-auto">
+  <button onclick="closeWatchlist()" class="text-2xl mb-4">← Back</button>
+  <h1 class="text-2xl sm:text-3xl font-bold mb-4">My Watchlist</h1>
+  <div id="watchlistGrid" class="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5"></div>
 </div>
 
 <!-- TRAILER -->
-<div id="trailerModal" class="hidden fixed inset-0 bg-black/90 flex justify-center items-center z-50">
-<div class="relative w-full max-w-xl">
-<button onclick="closeTrailer()" class="absolute -top-8 right-0 text-2xl">✕</button>
-<iframe id="trailerFrame" class="w-full aspect-video"></iframe>
-</div>
+<div id="trailerModal" class="hidden fixed inset-0 bg-black/90 flex justify-center items-center z-50" onclick="closeTrailer(event)">
+  <div class="relative w-full max-w-4xl px-4">
+    <button onclick="closeTrailer()" class="absolute -top-10 right-4 text-3xl">✕</button>
+    <iframe id="trailerFrame" class="w-full aspect-video rounded-xl" allowfullscreen></iframe>
+  </div>
 </div>
 
 <script>
-const API_KEY="2b670b583329b90bcbad43227626c5f9";
+const API_KEY = "2b670b583329b90bcbad43227626c5f9";
 
-let currentMovie=null;
-let watchlist=JSON.parse(localStorage.getItem("watchlist")||"[]");
+let currentMovie = null;
+let heroMovie = null;
+let watchlist = JSON.parse(localStorage.getItem("watchlist") || "[]");
+let continueList = JSON.parse(localStorage.getItem("continue") || "[]");
+let userCountry = "US";
+let heroRotationTimer = null;
+let searchTimer = null;
 
-/* FETCH */
-async function fetchMovies(url){
- const res=await fetch(url);
- const data=await res.json();
- return data.results||[];
+/* ---------- HELPERS ---------- */
+function getTitle(movie) {
+  return movie.title || movie.name || "Untitled";
 }
 
-/* CARD */
-function createCard(m){
- return `
- <div class="movie-card">
-  <img src="https://image.tmdb.org/t/p/w300${m.poster_path}" class="w-full h-36 object-cover rounded">
- </div>`;
+function hasPoster(movie) {
+  return !!movie.poster_path;
 }
 
-/* HERO */
-function setHero(m){
- hero.style.backgroundImage=`url(https://image.tmdb.org/t/p/original${m.backdrop_path})`;
- heroTitle.textContent=m.title||m.name;
- currentMovie=m;
+function cardHTML(movie) {
+  const title = getTitle(movie);
+  return `
+    <div class="movie-card">
+      <img
+        src="https://image.tmdb.org/t/p/w300${movie.poster_path}"
+        class="w-full h-44 sm:h-48 object-cover rounded-xl"
+        alt="${title}">
+      <p class="text-xs sm:text-sm mt-2 text-center line-clamp-2">${title}</p>
+    </div>
+  `;
 }
 
-/* LOAD */
-async function load(){
- const movies=await fetchMovies(`https://api.themoviedb.org/3/trending/all/week?api_key=${API_KEY}`);
- setHero(movies[0]);
-
- const html=movies.map(createCard).join("");
- rows.innerHTML=`<h2 class="text-xl my-4">Trending</h2><div class="scroll">${html}</div>`;
-
- rows.querySelectorAll(".movie-card").forEach((c,i)=>{
-  c.onclick=()=>showDetails(movies[i]);
- });
+async function fetchMovies(url) {
+  try {
+    const res = await fetch(url);
+    const data = await res.json();
+    return data.results || [];
+  } catch (e) {
+    return [];
+  }
 }
 
-/* DETAILS */
-function showDetails(m){
- currentMovie=m;
- mainPage.style.display="none";
- detailsPage.style.display="block";
-
- detailsPoster.src=`https://image.tmdb.org/t/p/w300${m.poster_path}`;
- detailsTitle.textContent=m.title||m.name;
- detailsOverview.textContent=m.overview;
+/* ---------- LOCATION ---------- */
+async function detectLocation() {
+  try {
+    const res = await fetch("https://ipapi.co/json");
+    const data = await res.json();
+    userCountry = data.country_code || "US";
+  } catch (e) {
+    userCountry = "US";
+  }
 }
 
-function closeDetailsPage(){
- detailsPage.style.display="none";
- mainPage.style.display="block";
+/* ---------- DATA ROWS ---------- */
+const baseRows = [
+  { title: "🔥 Trending", url: `https://api.themoviedb.org/3/trending/all/week?api_key=${API_KEY}` },
+  { title: "⭐ Top Rated", url: `https://api.themoviedb.org/3/movie/top_rated?api_key=${API_KEY}` },
+  { title: "🎬 Movies", url: `https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}` },
+  { title: "📺 TV Shows", url: `https://api.themoviedb.org/3/tv/popular?api_key=${API_KEY}` },
+  { title: "💥 Action", url: `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=28` },
+  { title: "👻 Horror", url: `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=27` },
+  { title: "🚀 Sci-Fi", url: `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=878` },
+  { title: "🎌 Anime", url: `https://api.themoviedb.org/3/discover/tv?api_key=${API_KEY}&with_keywords=210024` },
+  { title: "🇰🇷 K-Drama", url: `https://api.themoviedb.org/3/discover/tv?api_key=${API_KEY}&with_origin_country=KR` },
+  { title: "🇮🇳 Bollywood", url: `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_origin_country=IN` },
+  { title: "🇨🇳 Chinese Action", url: `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_origin_country=CN` }
+];
+
+/* ---------- HERO ---------- */
+function setHero(movie) {
+  if (!movie) return;
+
+  heroMovie = movie;
+  currentMovie = movie;
+
+  const bg = movie.backdrop_path
+    ? `linear-gradient(to bottom, rgba(0,0,0,.2), rgba(0,0,0,.9)), url(https://image.tmdb.org/t/p/original${movie.backdrop_path})`
+    : `linear-gradient(to bottom, rgba(0,0,0,.4), rgba(0,0,0,.95))`;
+
+  hero.style.backgroundImage = bg;
+  heroTitle.textContent = getTitle(movie);
 }
 
-/* SEARCH */
-searchInputFull.addEventListener("input", async e=>{
- const q=e.target.value;
- if(q.length<2) return;
+function startHeroRotation(movies) {
+  const usable = movies.filter(m => m.backdrop_path);
+  if (!usable.length) return;
 
- const res=await fetchMovies(`https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${q}`);
- const list=res.filter(m=>m.poster_path);
+  setHero(usable[Math.floor(Math.random() * usable.length)]);
 
- searchResults.innerHTML=list.map(createCard).join("");
+  if (heroRotationTimer) clearInterval(heroRotationTimer);
+  heroRotationTimer = setInterval(() => {
+    const randomMovie = usable[Math.floor(Math.random() * usable.length)];
+    setHero(randomMovie);
+  }, 10000);
+}
 
- searchResults.querySelectorAll(".movie-card").forEach((c,i)=>{
-  c.onclick=()=>{
-   closeSearchPage();
-   setTimeout(()=>showDetails(list[i]),100);
+/* ---------- LOAD ROWS ---------- */
+async function loadRows() {
+  rows.innerHTML = "";
+
+  const localRow = {
+    title: `🌍 Trending in ${userCountry}`,
+    url: `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&region=${userCountry}`
   };
- });
+
+  const allRows = [localRow, ...baseRows];
+
+  for (const row of allRows) {
+    const movies = (await fetchMovies(row.url)).filter(hasPoster);
+    if (!movies.length) continue;
+
+    const section = document.createElement("section");
+    section.className = "mb-10";
+    section.innerHTML = `
+      <h2 class="text-3xl font-bold mt-10 mb-6">${row.title}</h2>
+      <div class="scroll">${movies.map(cardHTML).join("")}</div>
+    `;
+    rows.appendChild(section);
+
+    section.querySelectorAll(".movie-card").forEach((card, i) => {
+      card.onclick = () => showDetails(movies[i]);
+    });
+
+    if (row.title.includes("Trending") && !heroMovie) {
+      startHeroRotation(movies);
+    }
+  }
+
+  loadRecommended();
+  loadContinue();
+}
+
+/* ---------- RECOMMENDED ---------- */
+async function loadRecommended() {
+  const movies = (await fetchMovies(`https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}`)).filter(hasPoster);
+  if (!movies.length) return;
+
+  const random = movies.sort(() => 0.5 - Math.random()).slice(0, 10);
+
+  const section = document.createElement("section");
+  section.className = "mb-10";
+  section.innerHTML = `
+    <h2 class="text-3xl font-bold mt-10 mb-6">🎯 Recommended For You</h2>
+    <div class="scroll">${random.map(cardHTML).join("")}</div>
+  `;
+  rows.prepend(section);
+
+  section.querySelectorAll(".movie-card").forEach((card, i) => {
+    card.onclick = () => showDetails(random[i]);
+  });
+}
+
+/* ---------- CONTINUE WATCHING ---------- */
+function saveContinue(movie) {
+  continueList = [movie, ...continueList.filter(m => m.id !== movie.id)].slice(0, 10);
+  localStorage.setItem("continue", JSON.stringify(continueList));
+}
+
+function loadContinue() {
+  if (!continueList.length) return;
+
+  const section = document.createElement("section");
+  section.className = "mb-10";
+  section.innerHTML = `
+    <h2 class="text-3xl font-bold mt-10 mb-6">⏯ Continue Watching</h2>
+    <div class="scroll">${continueList.map(cardHTML).join("")}</div>
+  `;
+  rows.prepend(section);
+
+  section.querySelectorAll(".movie-card").forEach((card, i) => {
+    card.onclick = () => showDetails(continueList[i]);
+  });
+}
+
+/* ---------- DETAILS ---------- */
+function showDetails(movie) {
+  if (!movie) return;
+
+  currentMovie = movie;
+  saveContinue(movie);
+
+  mainPage.classList.add("hidden");
+  detailsPage.classList.remove("hidden");
+
+  detailsPoster.src = movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : "";
+  detailsTitle.textContent = getTitle(movie);
+  detailsOverview.textContent = movie.overview || "No description available.";
+
+  updateWatchlistButton();
+
+  setTimeout(() => {
+    if (currentMovie && currentMovie.id === movie.id) {
+      playTrailerFromDetails();
+    }
+  }, 8000);
+}
+
+function closeDetailsPage() {
+  detailsPage.classList.add("hidden");
+  mainPage.classList.remove("hidden");
+}
+
+/* ---------- WATCHLIST ---------- */
+function toggleWatchlist() {
+  if (!currentMovie) return;
+
+  const exists = watchlist.some(m => m.id === currentMovie.id);
+  if (exists) {
+    watchlist = watchlist.filter(m => m.id !== currentMovie.id);
+  } else {
+    watchlist.unshift(currentMovie);
+  }
+
+  localStorage.setItem("watchlist", JSON.stringify(watchlist));
+  updateWatchlistButton();
+}
+
+function updateWatchlistButton() {
+  const btn = document.getElementById("watchlistBtn");
+  if (!btn || !currentMovie) return;
+
+  const exists = watchlist.some(m => m.id === currentMovie.id);
+  btn.textContent = exists ? "✓ Saved" : "+ Watchlist";
+}
+
+/* ---------- SEARCH ---------- */
+function openSearchPage() {
+  mainPage.classList.add("hidden");
+  searchPage.classList.remove("hidden");
+  searchInputFull.focus();
+}
+
+function closeSearchPage() {
+  searchPage.classList.add("hidden");
+  mainPage.classList.remove("hidden");
+  searchInputFull.value = "";
+  searchResults.innerHTML = "";
+  searchStatus.textContent = "";
+}
+
+searchInputFull.addEventListener("input", (e) => {
+  clearTimeout(searchTimer);
+
+  const q = e.target.value.trim();
+  if (q.length < 2) {
+    searchResults.innerHTML = "";
+    searchStatus.textContent = "";
+    return;
+  }
+
+  searchStatus.textContent = "Searching...";
+
+  searchTimer = setTimeout(async () => {
+    const res = await fetchMovies(`https://api.themoviedb.org/3/search/multi?api_key=${API_KEY}&query=${encodeURIComponent(q)}`);
+    const filtered = res.filter(m => (m.media_type === "movie" || m.media_type === "tv" || !m.media_type) && m.poster_path);
+
+    if (!filtered.length) {
+      searchStatus.textContent = "No results found";
+      searchResults.innerHTML = "";
+      return;
+    }
+
+    searchStatus.textContent = `${filtered.length} result${filtered.length > 1 ? "s" : ""} found`;
+    searchResults.innerHTML = filtered.map(cardHTML).join("");
+
+    searchResults.querySelectorAll(".movie-card").forEach((card, i) => {
+      card.onclick = () => {
+        closeSearchPage();
+        setTimeout(() => showDetails(filtered[i]), 120);
+      };
+    });
+  }, 350);
 });
 
-function openSearchPage(){
- mainPage.style.display="none";
- searchPage.style.display="block";
-}
-function closeSearchPage(){
- searchPage.style.display="none";
- mainPage.style.display="block";
-}
+/* ---------- WATCHLIST PAGE ---------- */
+function openWatchlist() {
+  mainPage.classList.add("hidden");
+  watchlistPage.classList.remove("hidden");
 
-/* WATCHLIST */
-function addToWatchlist(){
- watchlist.unshift(currentMovie);
- localStorage.setItem("watchlist",JSON.stringify(watchlist));
- alert("Saved!");
-}
+  const items = watchlist.filter(hasPoster);
+  watchlistGrid.innerHTML = items.length
+    ? items.map(cardHTML).join("")
+    : `<p class="text-gray-400">Your watchlist is empty.</p>`;
 
-function openWatchlist(){
- mainPage.style.display="none";
- watchlistPage.style.display="block";
- watchlistGrid.innerHTML=watchlist.map(createCard).join("");
-}
-function closeWatchlist(){
- watchlistPage.style.display="none";
- mainPage.style.display="block";
+  watchlistGrid.querySelectorAll(".movie-card").forEach((card, i) => {
+    card.onclick = () => showDetails(items[i]);
+  });
 }
 
-/* TRAILER */
-async function playTrailer(){
- const type=currentMovie.title?"movie":"tv";
- const res=await fetch(`https://api.themoviedb.org/3/${type}/${currentMovie.id}/videos?api_key=${API_KEY}`);
- const data=await res.json();
- const vid=data.results[0];
- if(!vid) return;
-
- trailerFrame.src=`https://www.youtube.com/embed/${vid.key}?autoplay=1`;
- trailerModal.classList.remove("hidden");
+function closeWatchlist() {
+  watchlistPage.classList.add("hidden");
+  mainPage.classList.remove("hidden");
 }
 
-function playHeroTrailer(){ playTrailer(); }
+/* ---------- STREAMING LINKS ---------- */
+function openPlatform(platform) {
+  if (!currentMovie) return;
+  const title = encodeURIComponent(getTitle(currentMovie));
 
-function closeTrailer(){
- trailerModal.classList.add("hidden");
- trailerFrame.src="";
+  if (platform === "netflix") {
+    window.open(`https://www.netflix.com/search?q=${title}`, "_blank");
+  } else if (platform === "prime") {
+    window.open(`https://www.primevideo.com/search/ref=atv_nb_sr?phrase=${title}`, "_blank");
+  } else if (platform === "disney") {
+    window.open(`https://www.disneyplus.com/search?q=${title}`, "_blank");
+  } else {
+    window.open(`https://www.google.com/search?q=${title}+watch+online`, "_blank");
+  }
 }
 
-/* START */
-window.onload=load;
-</script>
+/* ---------- TRAILER ---------- */
+async function openTrailerFor(movie) {
+  if (!movie) return;
 
-</body>
-</html>
+  const type = movie.title ? "movie" : "tv";
+  try {
+    const res = await fetch(`https://api.themoviedb.org/3/${type}/${movie.id}/videos?api_key=${API_KEY}`);
+    const data = await res.json();
+
+    const vid = (data.results || []).find(v => v.site === "YouTube" && v.type === "Trailer") || (data.results || [])[0];
+    if (!vid) return;
+
+    trailerFrame.src = `https://www.youtube.com/embed/${vid.key}?autoplay=1`;
+    trailerModal.classList.remove("hidden");
+  } catch (e) {
+    // fail silently
+  }
+}
+
+function playTrailerFromDetails() {
+  openTrailerFor(currentMovie);
+}
+
+function playHeroTrailer() {
+  openTrailerFor(heroMovie || currentMovie);
+}
+
+function closeTrailer(e) {
+  if (e && e.target !== trailerModal) return;
+  trailerModal.classList.add("hidden");
+  trailerFrame.src = "";
+}
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") closeTrailer();
+});
+
+/* ---------- INFO PAGES ---------- */
+function openPage(type) {
+  mainPage.classList.add("hidden");
+  infoPage.classList.remove("hidden");
+
+  if (type === "about") {
+    infoContent.innerHTML = `
+      <h1 class="text-3xl font-bold mb-5">About MovieHub</h1>
+      <p class="mb-4">MovieHub is a movie discovery platform built to help users explore trending movies, TV shows, anime, and more. It focuses on discovery, trailers, categories, and watch links rather than hosting full movies.</p>
+      <p class="mb-4">The site is designed to be fast, mobile-friendly, and easy to browse. Users can search titles, save favorites, continue watching later, and jump to streaming platforms when available.</p>
+      <p class="mb-4">MovieHub updates content regularly so visitors can quickly discover what is popular right now in their region and across different entertainment categories.</p>
+    `;
+  }
+
+  if (type === "contact") {
+    infoContent.innerHTML = `
+      <h1 class="text-3xl font-bold mb-5">Contact Us</h1>
+      <p class="mb-4">If you have questions, business inquiries, suggestions, or feedback, you can reach out using the details below.</p>
+      <p class="mb-4"><strong>Email:</strong> eh710214@gmail.com</p>
+      <p class="mb-4"><strong>Phone:</strong> +2349049696168</p>
+      <p class="mb-4">We aim to respond as quickly as possible and appreciate every message that helps improve the platform.</p>
+    `;
+  }
+
+  if (type === "privacy") {
+    infoContent.innerHTML = `
+      <h1 class="text-3xl font-bold mb-5">Privacy Policy</h1>
+      <p class="mb-4">This Privacy Policy explains how MovieHub handles visitor data, cookies,
