@@ -1,48 +1,66 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>MovieHub</title>
-  <style>
-    body {
-      background: #0f0f0f;
-      color: white;
-      font-family: Arial;
-      text-align: center;
-    }
-    .movies {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 20px;
-      padding: 20px;
-    }
-    .movie {
-      background: #1c1c1c;
-      padding: 10px;
-      border-radius: 10px;
-    }
-    img {
-      width: 100%;
-      border-radius: 10px;
-    }
-  </style>
-</head>
-<body>
-
-<h1>🔥 MovieHub</h1>
-
-<div class="movies" id="movies"></div>
-
+‎<!DOCTYPE html>
+‎<html lang="en">
+‎<head>
+‎  <meta charset="UTF-8">
+‎  <title>MovieHub</title>
+‎
+‎  <style>
+‎    body {
+‎      background: #0f0f0f;
+‎      color: white;
+‎      font-family: Arial;
+‎      margin: 0;
+‎    }
+‎
+‎    h1 {
+‎      text-align: center;
+‎      padding: 20px;
+‎    }
+‎
+‎    .movies {
+‎      display: grid;
+‎      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+‎      gap: 15px;
+‎      padding: 20px;
+‎    }
+‎
+‎    .movie {
+‎      background: #1c1c1c;
+‎      border-radius: 10px;
+‎      overflow: hidden;
+‎      transition: 0.3s;
+‎    }
+‎
+‎    .movie:hover {
+‎      transform: scale(1.05);
+‎    }
+‎
+‎    img {
+‎      width: 100%;
+‎    }
+‎
+‎    .info {
+‎      padding: 10px;
+‎    }
+‎  </style>
+‎</head>
+‎<body>
+‎
+‎<h1>🔥 MovieHub</h1>
+‎
+‎<div class="movies" id="movies"></div>
+‎
 ‎<script>
-‎const API_KEY = "37e39b166ef8c28d27abbe1e66cce807";
-‎const URL = `https://api.themoviedb.org/3/trending/movie/week?api_key=${37e39b166ef8c28d27abbe1e66cce807}`;
+‎const API_KEY = 37e39b166ef8c28d27abbe1e66cce807;
 ‎
-‎fetch(URL)
-‎  .then(res => res.json())
-‎  .then(data => {
-‎    console.log(data); // 👈 helps debug
+‎const URL = "https://api.themoviedb.org/3/trending/movie/week?api_key=" + API_KEY;
 ‎
-‎    const movies = document.getElementById("movies");
+‎async function getMovies() {
+‎  try {
+‎    const res = await fetch(URL);
+‎    const data = await res.json();
+‎
+‎    const moviesContainer = document.getElementById("movies");
 ‎
 ‎    data.results.forEach(movie => {
 ‎      const div = document.createElement("div");
@@ -50,15 +68,23 @@
 ‎
 ‎      div.innerHTML = `
 ‎        <img src="https://image.tmdb.org/t/p/w500${movie.poster_path}">
-‎        <h3>${movie.title}</h3>
-‎        <p>⭐ ${movie.vote_average}</p>
+‎        <div class="info">
+‎          <h3>${movie.title}</h3>
+‎          <p>⭐ ${movie.vote_average}</p>
+‎        </div>
 ‎      `;
 ‎
-‎      movies.appendChild(div);
+‎      moviesContainer.appendChild(div);
 ‎    });
-‎  })
-‎  .catch(err => console.error("ERROR:", err));
+‎
+‎  } catch (error) {
+‎    document.body.innerHTML += "<p>Error loading movies</p>";
+‎    console.error(error);
+‎  }
+‎}
+‎
+‎getMovies();
 ‎</script>
-
-</body>
-</html>
+‎
+‎</body>
+‎</html>
