@@ -51,48 +51,71 @@
       
       <div class="flex-1 max-w-md mx-4 relative">
         <input id="searchInput" type="text" 
-               class="w-full bg-zinc-900 border border-zinc-700 rounded-full px-5 py-3 text-sm focus:outline-none focus:border-rose-500"
+               onclick="openSearchPage()"
+               class="w-full bg-zinc-900 border border-zinc-700 rounded-full px-5 py-3 text-sm focus:outline-none focus:border-rose-500 cursor-pointer"
                placeholder="Search movies, anime, K-drama...">
-        
-        <div id="autocompleteDropdown" class="hidden absolute top-full left-0 right-0 mt-2 bg-zinc-900 border border-zinc-700 rounded-2xl shadow-2xl max-h-80 overflow-auto z-50"></div>
       </div>
     </div>
   </nav>
 
-  <!-- HERO -->
-  <div class="hero">
-    <div class="max-w-7xl mx-auto px-4 pb-12 w-full">
-      <p class="text-emerald-400 text-xs tracking-widest mb-2">TRENDING #1 THIS WEEK</p>
-      <h1 class="text-4xl sm:text-5xl font-bold mb-4">Dune: Part Two</h1>
-      <button onclick="playHeroTrailer()" 
-              class="bg-white text-black px-8 py-3.5 rounded-2xl font-semibold flex items-center gap-3">
-        <i class="fa-solid fa-play"></i> Watch Trailer
-      </button>
-    </div>
-  </div>
-
-  <!-- HORIZONTAL CATEGORIES (no extra space) -->
-  <div class="sticky top-16 bg-black/95 backdrop-blur-md z-40 border-b border-white/10">
-    <div class="max-w-7xl mx-auto px-4 py-4 overflow-x-auto">
-      <div id="categoryTabs" class="flex gap-6 text-sm font-medium overflow-x-auto">
-        <div onclick="switchCategory(0)" class="category-tab active cursor-pointer pb-2" data-index="0">🔥 Trending</div>
-        <div onclick="switchCategory(1)" class="category-tab cursor-pointer pb-2" data-index="1">🎬 Movies</div>
-        <div onclick="switchCategory(2)" class="category-tab cursor-pointer pb-2" data-index="2">📺 TV Shows</div>
-        <div onclick="switchCategory(3)" class="category-tab cursor-pointer pb-2" data-index="3">💥 Action</div>
-        <div onclick="switchCategory(4)" class="category-tab cursor-pointer pb-2" data-index="4">🎌 Anime</div>
-        <div onclick="switchCategory(5)" class="category-tab cursor-pointer pb-2" data-index="5">🇰🇷 K-Drama</div>
-        <div onclick="switchCategory(6)" class="category-tab cursor-pointer pb-2" data-index="6">👻 Horror</div>
-        <div onclick="switchCategory(7)" class="category-tab cursor-pointer pb-2" data-index="7">🚀 Sci-Fi</div>
-        <div onclick="switchCategory(8)" class="category-tab cursor-pointer pb-2" data-index="8">🇮🇳 Bollywood</div>
-        <div onclick="switchCategory(9)" class="category-tab cursor-pointer pb-2" data-index="9">🇨🇳 Chinese Action</div>
+  <!-- HERO + MAIN CATEGORIES (hidden when searching) -->
+  <div id="mainPage">
+    <div class="hero">
+      <div class="max-w-7xl mx-auto px-4 pb-12 w-full">
+        <p class="text-emerald-400 text-xs tracking-widest mb-2">TRENDING #1 THIS WEEK</p>
+        <h1 class="text-4xl sm:text-5xl font-bold mb-4">Dune: Part Two</h1>
+        <button onclick="playHeroTrailer()" 
+                class="bg-white text-black px-8 py-3.5 rounded-2xl font-semibold flex items-center gap-3">
+          <i class="fa-solid fa-play"></i> Watch Trailer
+        </button>
       </div>
     </div>
+
+    <!-- HORIZONTAL CATEGORIES -->
+    <div class="sticky top-16 bg-black/95 backdrop-blur-md z-40 border-b border-white/10">
+      <div class="max-w-7xl mx-auto px-4 py-4 overflow-x-auto">
+        <div id="categoryTabs" class="flex gap-6 text-sm font-medium overflow-x-auto">
+          <div onclick="switchCategory(0)" class="category-tab active cursor-pointer pb-2" data-index="0">🔥 Trending</div>
+          <div onclick="switchCategory(1)" class="category-tab cursor-pointer pb-2" data-index="1">🎬 Movies</div>
+          <div onclick="switchCategory(2)" class="category-tab cursor-pointer pb-2" data-index="2">📺 TV Shows</div>
+          <div onclick="switchCategory(3)" class="category-tab cursor-pointer pb-2" data-index="3">💥 Action</div>
+          <div onclick="switchCategory(4)" class="category-tab cursor-pointer pb-2" data-index="4">🎌 Anime</div>
+          <div onclick="switchCategory(5)" class="category-tab cursor-pointer pb-2" data-index="5">🇰🇷 K-Drama</div>
+          <div onclick="switchCategory(6)" class="category-tab cursor-pointer pb-2" data-index="6">👻 Horror</div>
+          <div onclick="switchCategory(7)" class="category-tab cursor-pointer pb-2" data-index="7">🚀 Sci-Fi</div>
+          <div onclick="switchCategory(8)" class="category-tab cursor-pointer pb-2" data-index="8">🇮🇳 Bollywood</div>
+          <div onclick="switchCategory(9)" class="category-tab cursor-pointer pb-2" data-index="9">🇨🇳 Chinese Action</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MOVIES SECTION -->
+    <div class="max-w-7xl mx-auto px-4 py-8">
+      <h2 id="currentCategory" class="text-2xl font-semibold mb-6">Trending This Week</h2>
+      <div id="moviesGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-5"></div>
+    </div>
   </div>
 
-  <!-- MOVIES SECTION -->
-  <div class="max-w-7xl mx-auto px-4 py-8">
-    <h2 id="currentCategory" class="text-2xl font-semibold mb-6">Trending This Week</h2>
-    <div id="moviesGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-5"></div>
+  <!-- SEARCH PAGE (Netflix style) -->
+  <div id="searchPage" class="hidden fixed inset-0 bg-black z-[100] overflow-auto">
+    <div class="max-w-7xl mx-auto px-4 pt-20">
+      <div class="flex items-center gap-3 mb-6">
+        <button onclick="closeSearchPage()" class="text-3xl">←</button>
+        <input id="searchInputFull" type="text" 
+               class="flex-1 bg-zinc-900 border border-zinc-700 rounded-full px-5 py-3 text-sm focus:outline-none focus:border-rose-500"
+               placeholder="Search movies, series, anime...">
+      </div>
+
+      <div id="searchResults" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-5"></div>
+
+      <!-- Not Available + Recommendations -->
+      <div id="noResults" class="hidden text-center py-12">
+        <p class="text-2xl font-semibold mb-2">No results found</p>
+        <p class="text-gray-400 mb-8">We couldn't find any matches for your search.</p>
+        <h3 class="text-xl font-medium mb-4">You might like these</h3>
+        <div id="recommendations" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-5"></div>
+      </div>
+    </div>
   </div>
 
   <!-- MOVIE MODAL -->
@@ -119,6 +142,22 @@
 
         <button onclick="playTrailer()" class="mt-6 w-full bg-rose-600 py-4 rounded-2xl font-medium flex items-center justify-center gap-2">
           <i class="fa-solid fa-play"></i> Play Trailer
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TRAILER MODAL -->
+  <div id="trailerModal" class="hidden fixed inset-0 bg-black/95 z-[300] flex items-center justify-center p-4">
+    <div class="w-full max-w-md bg-zinc-900 rounded-3xl overflow-hidden">
+      <div class="p-6 text-center">
+        <button onclick="closeTrailerModal()" class="absolute top-4 right-4 text-3xl">✕</button>
+        <i class="fa-solid fa-play-circle text-8xl text-white mb-6"></i>
+        <h3 id="trailerTitle" class="text-2xl font-bold mb-4"></h3>
+        <p class="text-gray-400 mb-8">Watch the official trailer on YouTube</p>
+        <button onclick="openYouTubeTrailer()" 
+                class="w-full bg-white text-black py-4 rounded-2xl font-semibold flex items-center justify-center gap-3">
+          <i class="fa-solid fa-external-link-alt"></i> Open Trailer on YouTube
         </button>
       </div>
     </div>
@@ -227,58 +266,56 @@
       loadMovies(cat.url, cat.name);
     }
 
-    // Autocomplete
-    const searchInput = document.getElementById("searchInput");
-    const dropdown = document.getElementById("autocompleteDropdown");
-    let debounceTimer;
-
-    searchInput.addEventListener("input", () => {
-      clearTimeout(debounceTimer);
-      debounceTimer = setTimeout(showSuggestions, 300);
-    });
-
-    async function showSuggestions() {
-      const query = searchInput.value.trim();
-      if (query.length < 2) {
-        dropdown.classList.add("hidden");
-        return;
-      }
-      const results = await fetchMovies(`https://api.themoviedb.org/3/search/multi?api_key=\( {API_KEY}&query= \){encodeURIComponent(query)}`);
-      dropdown.innerHTML = "";
-      if (results.length === 0) {
-        dropdown.classList.add("hidden");
-        return;
-      }
-      results.slice(0, 8).forEach(item => {
-        const title = item.title || item.name;
-        const div = document.createElement("div");
-        div.className = "px-4 py-3 hover:bg-zinc-800 cursor-pointer flex items-center gap-3 border-b border-white/10 last:border-none";
-        div.innerHTML = `<div class="font-medium">${title}</div>`;
-        div.onclick = () => {
-          searchInput.value = title;
-          dropdown.classList.add("hidden");
-          document.getElementById("currentCategory").textContent = `Results for "${title}"`;
-          loadMovies(`https://api.themoviedb.org/3/search/multi?api_key=\( {API_KEY}&query= \){encodeURIComponent(title)}`);
-        };
-        dropdown.appendChild(div);
-      });
-      dropdown.classList.remove("hidden");
+    // ====================== NETFLIX-STYLE SEARCH PAGE ======================
+    function openSearchPage() {
+      document.getElementById("mainPage").classList.add("hidden");
+      document.getElementById("searchPage").classList.remove("hidden");
+      document.getElementById("searchInputFull").focus();
     }
 
-    document.addEventListener("click", (e) => {
-      if (!searchInput.contains(e.target)) dropdown.classList.add("hidden");
+    function closeSearchPage() {
+      document.getElementById("searchPage").classList.add("hidden");
+      document.getElementById("mainPage").classList.remove("hidden");
+      document.getElementById("searchInputFull").value = "";
+      document.getElementById("searchResults").innerHTML = "";
+      document.getElementById("noResults").classList.add("hidden");
+    }
+
+    const searchInputFull = document.getElementById("searchInputFull");
+
+    searchInputFull.addEventListener("input", () => {
+      clearTimeout(window.searchTimer);
+      window.searchTimer = setTimeout(performSearch, 400);
     });
 
-    searchInput.addEventListener("keypress", (e) => {
-      if (e.key === "Enter") {
-        const query = searchInput.value.trim();
-        if (query) {
-          dropdown.classList.add("hidden");
-          document.getElementById("currentCategory").textContent = `Results for "${query}"`;
-          loadMovies(`https://api.themoviedb.org/3/search/multi?api_key=\( {API_KEY}&query= \){encodeURIComponent(query)}`);
-        }
+    async function performSearch() {
+      const query = searchInputFull.value.trim();
+      const resultsContainer = document.getElementById("searchResults");
+      const noResultsDiv = document.getElementById("noResults");
+
+      if (query.length < 2) {
+        resultsContainer.innerHTML = "";
+        noResultsDiv.classList.add("hidden");
+        return;
       }
-    });
+
+      const results = await fetchMovies(`https://api.themoviedb.org/3/search/multi?api_key=\( {API_KEY}&query= \){encodeURIComponent(query)}`);
+
+      resultsContainer.innerHTML = "";
+
+      if (results.length === 0) {
+        noResultsDiv.classList.remove("hidden");
+        // Show recommendations
+        const recs = await fetchMovies(`https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}`);
+        const recContainer = document.getElementById("recommendations");
+        recContainer.innerHTML = "";
+        recs.slice(0, 12).forEach(movie => recContainer.appendChild(createCard(movie)));
+        return;
+      }
+
+      noResultsDiv.classList.add("hidden");
+      results.slice(0, 30).forEach(movie => resultsContainer.appendChild(createCard(movie)));
+    }
 
     // Initialize
     window.onload = () => {
