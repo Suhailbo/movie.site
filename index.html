@@ -7,7 +7,6 @@
 
 <script src="https://cdn.tailwindcss.com"></script>
 
-<!-- AdSense -->
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2257272049115568"
 crossorigin="anonymous"></script>
 
@@ -34,7 +33,7 @@ body { background:#0a0a0a; color:white; font-family:sans-serif; }
 <!-- NAV -->
 <nav class="fixed top-0 w-full bg-black/90 p-4 flex justify-between z-50">
 <h1 class="text-3xl font-bold">🎬 MovieHub</h1>
-<div class="flex gap-6 text-lg">
+<div class="flex gap-6">
 <span onclick="openSearchPage()" class="cursor-pointer">Search</span>
 <span onclick="openWatchlist()" class="cursor-pointer">❤️ Watchlist</span>
 </div>
@@ -59,12 +58,11 @@ body { background:#0a0a0a; color:white; font-family:sans-serif; }
 <div class="grid md:grid-cols-4 gap-6 text-lg">
 
 <div>
-<h3 class="font-bold text-white mb-2">MovieHub</h3>
-<p>Discover movies, trailers, anime, and more.</p>
+<h3 class="font-bold text-white">MovieHub</h3>
+<p>Discover movies, trailers, anime and more.</p>
 </div>
 
 <div>
-<h3 class="font-bold text-white mb-2">Pages</h3>
 <p onclick="openPage('about')" class="cursor-pointer">About</p>
 <p onclick="openPage('contact')" class="cursor-pointer">Contact</p>
 <p onclick="openPage('privacy')" class="cursor-pointer">Privacy Policy</p>
@@ -72,14 +70,12 @@ body { background:#0a0a0a; color:white; font-family:sans-serif; }
 </div>
 
 <div>
-<h3 class="font-bold text-white mb-2">Contact</h3>
 <p>Email: eh710214@gmail.com</p>
 <p>Phone: +2349049696168</p>
 </div>
 
 <div>
-<h3 class="font-bold text-white mb-2">Disclaimer</h3>
-<p>We do not host movies. All content belongs to respective owners.</p>
+<p>We do not host movies. All content belongs to owners.</p>
 </div>
 
 </div>
@@ -123,9 +119,12 @@ body { background:#0a0a0a; color:white; font-family:sans-serif; }
 <div id="watchlistGrid" class="grid grid-cols-2 md:grid-cols-5 gap-4"></div>
 </div>
 
-<!-- TRAILER -->
-<div id="trailerModal" class="hidden fixed inset-0 bg-black/90 flex justify-center items-center">
-<iframe id="trailerFrame" class="w-full max-w-3xl aspect-video"></iframe>
+<!-- TRAILER MODAL -->
+<div id="trailerModal" class="hidden fixed inset-0 bg-black/90 flex justify-center items-center z-50" onclick="closeTrailer(event)">
+<div class="relative w-full max-w-3xl">
+<button onclick="closeTrailer()" class="absolute -top-10 right-0 text-3xl">✕</button>
+<iframe id="trailerFrame" class="w-full aspect-video"></iframe>
+</div>
 </div>
 
 <script>
@@ -134,20 +133,18 @@ const API_KEY="2b670b583329b90bcbad43227626c5f9";
 let currentMovie=null;
 let watchlist=JSON.parse(localStorage.getItem("watchlist")||"[]");
 let continueList=JSON.parse(localStorage.getItem("continue")||"[]");
-
 let userCountry="US";
 
 async function detectLocation(){
  try{
   const res=await fetch("https://ipapi.co/json");
   const data=await res.json();
-  userCountry=data.country_code || "US";
+  userCountry=data.country_code||"US";
  }catch(e){}
 }
 
 const baseRows=[
 {title:"🔥 Trending",url:`https://api.themoviedb.org/3/trending/all/week?api_key=${API_KEY}`},
-{title:"⭐ Top Rated",url:`https://api.themoviedb.org/3/movie/top_rated?api_key=${API_KEY}`},
 {title:"🎬 Movies",url:`https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}`},
 {title:"📺 TV Shows",url:`https://api.themoviedb.org/3/tv/popular?api_key=${API_KEY}`},
 {title:"💥 Action",url:`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=28`},
@@ -156,7 +153,7 @@ const baseRows=[
 {title:"🎌 Anime",url:`https://api.themoviedb.org/3/discover/tv?api_key=${API_KEY}&with_keywords=210024`},
 {title:"🇰🇷 K-Drama",url:`https://api.themoviedb.org/3/discover/tv?api_key=${API_KEY}&with_origin_country=KR`},
 {title:"🇮🇳 Bollywood",url:`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_origin_country=IN`},
-{title:"🇨🇳 Chinese Action",url:`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_origin_country=CN`}
+{title:"🇨🇳 Chinese",url:`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_origin_country=CN`}
 ];
 
 async function fetchMovies(url){
@@ -199,8 +196,8 @@ async function loadRows(){
 
   const div=document.createElement("div");
   div.innerHTML=`
-    <h2 class="text-3xl font-bold mt-10 mb-6">${row.title}</h2>
-    <div class="scroll mb-8">${movies.map(createCard).join("")}</div>
+  <h2 class="text-3xl font-bold mt-10 mb-6">${row.title}</h2>
+  <div class="scroll mb-8">${movies.map(createCard).join("")}</div>
   `;
   rows.appendChild(div);
 
@@ -223,14 +220,10 @@ async function loadRecommended(){
 
  const section=document.createElement("div");
  section.innerHTML=`
- <h2 class="text-3xl font-bold mt-10 mb-6">🎯 Recommended For You</h2>
+ <h2 class="text-3xl font-bold mt-10 mb-6">🎯 Recommended</h2>
  <div class="scroll mb-8">${random.map(createCard).join("")}</div>
  `;
  rows.prepend(section);
-
- section.querySelectorAll(".movie-card").forEach((c,i)=>{
-  c.onclick=()=>showDetails(random[i]);
- });
 }
 
 function loadContinue(){
@@ -257,13 +250,7 @@ function showDetails(movie){
 
  detailsPoster.src=`https://image.tmdb.org/t/p/w500${movie.poster_path}`;
  detailsTitle.textContent=movie.title||movie.name;
-
- detailsOverview.innerHTML=`
- ${movie.overview}
- <p class="mt-4 text-white font-semibold">
- 🔥 Tap below to watch trailer or find where to stream
- </p>
- `;
+ detailsOverview.textContent=movie.overview;
 
  setTimeout(()=>{
   if(currentMovie===movie){
@@ -302,10 +289,7 @@ function closeWatchlist(){
 
 function openPlatform(p){
  const t=encodeURIComponent(currentMovie.title||currentMovie.name);
- if(p==="netflix") window.open(`https://www.netflix.com/search?q=${t}`);
- else if(p==="prime") window.open(`https://www.primevideo.com/search?phrase=${t}`);
- else if(p==="disney") window.open(`https://www.disneyplus.com/search?q=${t}`);
- else window.open(`https://www.google.com/search?q=${t}+watch`);
+ window.open(`https://www.google.com/search?q=${t}+watch`);
 }
 
 async function playTrailerFromDetails(){
@@ -316,31 +300,29 @@ async function playTrailerFromDetails(){
  if(!vid) return;
 
  trailerFrame.src=`https://www.youtube.com/embed/${vid.key}?autoplay=1`;
- trailerModal.style.display="flex";
+ trailerModal.classList.remove("hidden");
 }
 
 function playHeroTrailer(){ playTrailerFromDetails(); }
 
-function closeTrailer(){
- trailerModal.style.display="none";
+function closeTrailer(e){
+ if(e && e.target !== trailerModal) return;
+ trailerModal.classList.add("hidden");
  trailerFrame.src="";
 }
+
+document.addEventListener("keydown",e=>{
+ if(e.key==="Escape") closeTrailer();
+});
 
 function openPage(type){
  mainPage.style.display="none";
  infoPage.style.display="block";
 
- if(type==="about"){
-  infoContent.innerHTML="<h1>About</h1><p>MovieHub is a movie discovery platform.</p>";
- }
  if(type==="contact"){
-  infoContent.innerHTML="<h1>Contact</h1><p>Email: eh710214@gmail.com<br>Phone: +2349049696168</p>";
- }
- if(type==="privacy"){
-  infoContent.innerHTML="<h1>Privacy Policy</h1><p>We use cookies and ads.</p>";
- }
- if(type==="terms"){
-  infoContent.innerHTML="<h1>Terms</h1><p>Use responsibly.</p>";
+  infoContent.innerHTML="Email: eh710214@gmail.com<br>Phone: +2349049696168";
+ } else {
+  infoContent.innerHTML="Information page";
  }
 }
 
