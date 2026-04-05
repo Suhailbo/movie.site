@@ -41,18 +41,17 @@ body { background:#000; color:white; }
 
 <body>
 
-<!-- NAV -->
-<nav class="fixed w-full bg-black flex justify-between p-4 z-50">
+<!-- NAV (FIXED ISSUE HERE) -->
+<nav class="sticky top-0 backdrop-blur bg-black/70 flex justify-between p-4 z-50">
 <h1 onclick="goHome()" class="font-bold cursor-pointer">🎬 MovieHub</h1>
 
 <input id="searchInput"
 placeholder="Search movies..."
-class="bg-gray-900 border border-gray-600 px-4 py-2 rounded w-1/2 text-white placeholder-gray-400 focus:outline-none focus:border-white">
+class="bg-gray-900 border border-gray-600 px-4 py-2 rounded w-1/2 text-white">
 </nav>
 
 <!-- SEARCH PAGE -->
 <div id="searchPage" class="searchPage pt-20 px-4">
-
 <button onclick="closeSearch()" class="mb-4 bg-gray-700 px-4 py-2 rounded">← Back</button>
 
 <input id="searchInput2"
@@ -60,19 +59,22 @@ placeholder="Search movies..."
 class="w-full bg-gray-900 border border-gray-600 px-4 py-3 rounded text-white mb-4">
 
 <div id="searchResults" class="space-y-4"></div>
-
 </div>
 
 <!-- MOVIE PAGE -->
 <div id="moviePage" class="searchPage pt-20 px-4">
 <button onclick="closeMoviePage()" class="mb-4 bg-gray-700 px-4 py-2 rounded">← Back</button>
+
 <div id="movieDetails"></div>
+
+<h2 class="mt-6 text-xl">🤖 Recommended</h2>
+<div id="recommendations" class="scroll mt-3"></div>
 </div>
 
 <!-- HOME -->
 <div id="homePage">
 
-<div class="hero mt-16">
+<div class="hero">
 <iframe id="heroVideo" allow="autoplay"></iframe>
 <div class="overlay"></div>
 
@@ -88,25 +90,52 @@ class="w-full bg-gray-900 border border-gray-600 px-4 py-3 rounded text-white mb
 <h2 class="text-xl mt-4 mb-2">🔥 Top 10</h2>
 <div id="top10" class="scroll mb-4"></div>
 
-<div class="text-center my-4">
-<ins class="adsbygoogle"
-style="display:block"
-data-ad-client="ca-pub-2257272049115568"
-data-ad-slot="1411335960"
-data-ad-format="auto"
-data-full-width-responsive="true"></ins>
-<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-</div>
-
 <div id="rows"></div>
 
 </div>
 </div>
 
-<!-- FOOTER -->
-<footer class="bg-black text-gray-400 mt-10 px-6 py-10 border-t border-gray-800 text-center">
-<p>© 2026 MovieHub</p>
-<p>Email: eh710214@gmail.com | Phone: +2349049696168</p>
+<!-- PREMIUM FOOTER -->
+<footer class="bg-black border-t border-gray-800 mt-10 px-6 py-10">
+
+<div class="grid md:grid-cols-3 gap-8">
+
+<div>
+<h2 class="text-white font-bold text-lg mb-3">🎬 MovieHub</h2>
+<p class="text-gray-400">Stream trailers, discover movies, and explore content worldwide.</p>
+</div>
+
+<div>
+<h3 class="text-white mb-3">Explore</h3>
+<ul class="space-y-2 text-gray-400">
+<li>Home</li>
+<li>Top Movies</li>
+<li>Categories</li>
+<li>Trending</li>
+</ul>
+</div>
+
+<div>
+<h3 class="text-white mb-3">Send Feedback</h3>
+
+<form action="https://formsubmit.co/eh710214@gmail.com" method="POST">
+<input type="text" name="name" placeholder="Name" class="w-full mb-2 bg-gray-800 p-2 rounded">
+<input type="email" name="email" placeholder="Email" class="w-full mb-2 bg-gray-800 p-2 rounded">
+<textarea name="message" placeholder="Your feedback..." class="w-full mb-2 bg-gray-800 p-2 rounded"></textarea>
+
+<button class="bg-white text-black px-4 py-2 w-full rounded">Send</button>
+
+<input type="hidden" name="_captcha" value="false">
+</form>
+
+</div>
+
+</div>
+
+<div class="text-center text-gray-500 mt-6 text-sm">
+© 2026 MovieHub | +2349049696168
+</div>
+
 </footer>
 
 <script>
@@ -115,13 +144,12 @@ const API_KEY="2b670b583329b90bcbad43227626c5f9";
 
 let heroMovie;
 
-// SEARCH OPEN
-searchInput.onclick = ()=>{
+// SEARCH
+searchInput.onclick=()=>{
  searchPage.style.display="block";
  setTimeout(()=>searchInput2.focus(),100);
 };
 
-// SYNC INPUTS
 searchInput.oninput=()=>{
  searchInput2.value=searchInput.value;
  runSearch(searchInput.value);
@@ -132,7 +160,6 @@ searchInput2.oninput=()=>{
  runSearch(searchInput2.value);
 };
 
-// SEARCH FUNCTION
 async function runSearch(q){
  if(q.length<2){ searchResults.innerHTML=""; return; }
 
@@ -153,9 +180,7 @@ async function runSearch(q){
  });
 }
 
-function closeSearch(){
- searchPage.style.display="none";
-}
+function closeSearch(){ searchPage.style.display="none"; }
 
 // TRAILER
 async function getTrailer(id){
@@ -171,6 +196,13 @@ async function getProviders(id){
  return d.results?.NG?.flatrate || [];
 }
 
+// RECOMMENDATIONS (AI-LIKE)
+async function getRecommendations(id){
+ const r=await fetch(`https://api.themoviedb.org/3/movie/${id}/recommendations?api_key=${API_KEY}`);
+ const d=await r.json();
+ return d.results.slice(0,10);
+}
+
 // MOVIE PAGE
 async function openMovie(m){
 
@@ -179,6 +211,7 @@ async function openMovie(m){
 
  const trailer=await getTrailer(m.id);
  const providers=await getProviders(m.id);
+ const recs=await getRecommendations(m.id);
 
  const hasNetflix = providers.some(p=>p.provider_name==="Netflix");
  const hasPrime = providers.some(p=>p.provider_name==="Amazon Prime Video");
@@ -195,24 +228,31 @@ async function openMovie(m){
 
  <div class="flex gap-3 mb-4">
 
- <button class="${hasNetflix ? 'bg-red-600' : 'bg-gray-600 opacity-50'} px-4 py-2">
+ <button class="${hasNetflix ? 'bg-red-600' : 'bg-gray-600 opacity-50'} px-4 py-2 rounded">
  ${hasNetflix ? 'Watch on Netflix' : 'Not on Netflix'}
  </button>
 
- <button class="${hasPrime ? 'bg-blue-600' : 'bg-gray-600 opacity-50'} px-4 py-2">
+ <button class="${hasPrime ? 'bg-blue-600' : 'bg-gray-600 opacity-50'} px-4 py-2 rounded">
  ${hasPrime ? 'Watch on Prime' : 'Not on Prime'}
  </button>
 
  </div>
 
- <button onclick="playTrailer('${trailer}')" class="bg-white text-black px-4 py-2">
+ <button onclick="playTrailer('${trailer}')" class="bg-white text-black px-4 py-2 rounded">
  ▶ Watch Trailer
  </button>
 
  <div id="trailerBox" class="mt-4"></div>
 
  </div>
- </div>`;
+ </div>
+ `;
+
+ // RECOMMENDATIONS
+ recommendations.innerHTML=recs.map(r=>`
+ <div class="card" onclick='openMovie(${JSON.stringify(r)})'>
+ <img src="https://image.tmdb.org/t/p/w300${r.poster_path}">
+ </div>`).join("");
 }
 
 function playTrailer(k){
