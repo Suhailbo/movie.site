@@ -69,10 +69,6 @@ body { background:#0a0a0a; color:white; font-family:sans-serif; }
   MovieHub helps you explore trending movies, anime, and TV shows. Watch trailers,
   discover new releases, and find your next favorite content easily.
   </p>
-  <p class="mt-4">
-MovieHub is intended for entertainment and informational purposes only.
-All movie content, posters, and trailers belong to their respective owners.
-  </p>
   <p class="mt-2">
   We aim to provide a smooth and enjoyable browsing experience for movie lovers worldwide.
   </p>
@@ -160,7 +156,6 @@ async function fetchMovies(url){
 }
 
 function createCard(movie){
-  if(!movie.poster_path) return "";
   return `<div class="movie-card">
     <img src="https://image.tmdb.org/t/p/w300${movie.poster_path}" class="rounded-xl">
   </div>`;
@@ -169,7 +164,7 @@ function createCard(movie){
 async function loadRows(){
   rows.innerHTML="";
   for(let row of rowsData){
-    const movies=await fetchMovies(row.url);
+    const movies=(await fetchMovies(row.url)).filter(m=>m.poster_path);
 
     const section=document.createElement("div");
     section.className="mb-10";
@@ -235,10 +230,12 @@ searchInputFull.addEventListener("input",async e=>{
   if(q.length<3) return;
 
   const res=await fetchMovies(`https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(q)}`);
-  searchResults.innerHTML=res.map(createCard).join('');
+  const clean=res.filter(m=>m.poster_path);
+
+  searchResults.innerHTML=clean.map(createCard).join('');
 
   searchResults.querySelectorAll(".movie-card").forEach((card,i)=>{
-    card.onclick=()=>showDetails(res[i]);
+    card.onclick=()=>showDetails(clean[i]);
   });
 });
 
@@ -265,7 +262,8 @@ function openPage(type){
     infoContent.innerHTML=`
     <h1 class="text-3xl mb-6 font-bold">About MovieHub</h1>
     <p class="mb-4">MovieHub helps users discover trending movies, anime, and TV shows worldwide.</p>
-    <p class="mb-4">We do not host movies. We provide trailers and information only.</p>`;
+    <p class="mb-4">We do not host movies. We provide trailers and information only.</p>
+    <p class="mb-4">All content belongs to their respective owners.</p>`;
   }
 
   if(type==="contact"){
@@ -278,7 +276,8 @@ function openPage(type){
     infoContent.innerHTML=`
     <h1 class="text-3xl mb-6 font-bold">Privacy Policy</h1>
     <p class="mb-4">We respect your privacy and do not collect personal data.</p>
-    <p class="mb-4">Ads may use cookies to improve experience.</p>`;
+    <p class="mb-4">Third-party ads may use cookies.</p>
+    <p class="mb-4">By using this site, you agree to this policy.</p>`;
   }
 }
 
