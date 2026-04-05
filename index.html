@@ -33,28 +33,32 @@
 
 <div class="movies" id="movies"></div>
 
-<script>
-const API_KEY = 37e39b166ef8c28d27abbe1e66cce807
-const URL = `https://api.themoviedb.org/3/trending/movie/week?api_key=${API_KEY}`;
-
-fetch(URL)
-  .then(res => res.json())
-  .then(data => {
-    const movies = document.getElementById("movies");
-    data.results.forEach(movie => {
-      const div = document.createElement("div");
-      div.classList.add("movie");
-
-      div.innerHTML = `
-        <img src="https://image.tmdb.org/t/p/w500${movie.poster_path}">
-        <h3>${movie.title}</h3>
-        <p>⭐ ${movie.vote_average}</p>
-      `;
-
-      movies.appendChild(div);
-    });
-  });
-</script>
+‎<script>
+‎const API_KEY = "37e39b166ef8c28d27abbe1e66cce807";
+‎const URL = `https://api.themoviedb.org/3/trending/movie/week?api_key=${37e39b166ef8c28d27abbe1e66cce807}`;
+‎
+‎fetch(URL)
+‎  .then(res => res.json())
+‎  .then(data => {
+‎    console.log(data); // 👈 helps debug
+‎
+‎    const movies = document.getElementById("movies");
+‎
+‎    data.results.forEach(movie => {
+‎      const div = document.createElement("div");
+‎      div.classList.add("movie");
+‎
+‎      div.innerHTML = `
+‎        <img src="https://image.tmdb.org/t/p/w500${movie.poster_path}">
+‎        <h3>${movie.title}</h3>
+‎        <p>⭐ ${movie.vote_average}</p>
+‎      `;
+‎
+‎      movies.appendChild(div);
+‎    });
+‎  })
+‎  .catch(err => console.error("ERROR:", err));
+‎</script>
 
 </body>
 </html>
