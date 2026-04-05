@@ -6,19 +6,16 @@
 <title>MovieHub</title>
 <script src="https://cdn.tailwindcss.com"></script>
 
-<!-- ADSENSE -->
+<!-- AdSense -->
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2257272049115568"
 crossorigin="anonymous"></script>
 
 <style>
 body { background:#0a0a0a; color:white; font-family:sans-serif; }
-
 .scroll { display:flex; overflow-x:auto; gap:12px; }
 .scroll::-webkit-scrollbar { display:none; }
-
 .movie-card { min-width:150px; cursor:pointer; transition:0.3s; }
 .movie-card:hover { transform:scale(1.1); }
-
 .hero {
   height:65vh;
   display:flex;
@@ -34,7 +31,7 @@ body { background:#0a0a0a; color:white; font-family:sans-serif; }
 
 <!-- NAV -->
 <nav class="fixed top-0 w-full bg-black/90 p-4 flex justify-between items-center z-50">
-  <h1 class="text-2xl font-bold">MovieHub</h1>
+  <h1 class="text-2xl font-bold">MovieHub ❤️</h1>
   <div class="flex gap-3">
     <button onclick="openWatchlist()">❤️</button>
     <input onclick="openSearchPage()" placeholder="Search..."
@@ -96,7 +93,7 @@ data-full-width-responsive="true"></ins>
   <h1 id="detailsTitle" class="text-2xl font-bold"></h1>
   <p id="detailsOverview" class="text-gray-400"></p>
 
-  <!-- DETAILS AD -->
+  <!-- AD -->
   <div class="my-4 flex justify-center">
     <ins class="adsbygoogle"
     style="display:block"
@@ -125,7 +122,7 @@ data-full-width-responsive="true"></ins>
 </div>
 
 <script>
-const API_KEY="PUT_YOUR_API_KEY";
+const API_KEY="2b670b583329b90bcbad43227626c5f9";
 let currentMovie=null;
 let watchlist=JSON.parse(localStorage.getItem("watchlist")||"[]");
 
@@ -138,169 +135,138 @@ const rowsData=[
 ];
 
 async function fetchMovies(url){
-const res=await fetch(url);
-return (await res.json()).results||[];
+  try{
+    const res=await fetch(url);
+    const data=await res.json();
+    return data.results||[];
+  }catch(e){ return []; }
 }
 
 function createCard(movie){
-const poster=movie.poster_path
-?`https://image.tmdb.org/t/p/w300${movie.poster_path}`
-:"https://via.placeholder.com/300x450";
-
-return `<div class="movie-card">
-<img src="${poster}" class="rounded">
-</div>`;
+  if(!movie.poster_path) return "";
+  return `<div class="movie-card">
+    <img src="https://image.tmdb.org/t/p/w300${movie.poster_path}" class="rounded">
+  </div>`;
 }
 
 async function loadRows(){
-rows.innerHTML="";
+  rows.innerHTML="";
+  for(let row of rowsData){
+    const movies=await fetchMovies(row.url);
 
-for(let row of rowsData){
-const movies=await fetchMovies(row.url);
+    const rowDiv=document.createElement("div");
+    rowDiv.innerHTML=`
+    <h2 class="mb-2">${row.title}</h2>
+    <div class="scroll">${movies.map(createCard).join("")}</div>
+    `;
 
-const rowDiv=document.createElement("div");
-rowDiv.innerHTML=`
-<h2 class="mb-2">${row.title}</h2>
-<div class="scroll">${movies.map(createCard).join("")}</div>
+    rows.appendChild(rowDiv);
 
-<!-- MID AD -->
-<div class="my-6 flex justify-center">
-<ins class="adsbygoogle"
-style="display:block"
-data-ad-client="ca-pub-2257272049115568"
-data-ad-slot="1234567890"
-data-ad-format="auto"></ins>
-</div>
-`;
+    rowDiv.querySelectorAll(".movie-card").forEach((card,i)=>{
+      card.onclick=()=>showDetails(movies[i]);
+    });
 
-rows.appendChild(rowDiv);
-(adsbygoogle = window.adsbygoogle || []).push({});
-
-rowDiv.querySelectorAll(".movie-card").forEach((card,i)=>{
-card.onclick=()=>showDetails(movies[i]);
-});
-
-if(row.title==="Trending") setHero(movies[0]);
-}
+    if(row.title==="Trending" && movies.length>0){
+      setHero(movies[0]);
+    }
+  }
 }
 
 async function setHero(movie){
-currentMovie=movie;
+  currentMovie=movie;
 
-hero.style.backgroundImage=
-`linear-gradient(to bottom, rgba(0,0,0,0.7), black),
-url(https://image.tmdb.org/t/p/original${movie.backdrop_path})`;
+  hero.style.backgroundImage=
+  `linear-gradient(to bottom, rgba(0,0,0,0.7), black),
+  url(https://image.tmdb.org/t/p/original${movie.backdrop_path})`;
 
-heroTitle.textContent=movie.title||movie.name;
+  heroTitle.textContent=movie.title||movie.name;
 
-heroTrailer.classList.add("hidden");
-heroTrailer.src="";
+  setTimeout(async ()=>{
+    const type=movie.title?"movie":"tv";
+    const res=await fetch(`https://api.themoviedb.org/3/${type}/${movie.id}/videos?api_key=${API_KEY}`);
+    const data=await res.json();
 
-setTimeout(async ()=>{
-const type=movie.title?"movie":"tv";
+    const vid=data.results.find(v=>v.type==="Trailer");
+    if(!vid) return;
 
-const res=await fetch(`https://api.themoviedb.org/3/${type}/${movie.id}/videos?api_key=${API_KEY}`);
-const data=await res.json();
-
-const vid=data.results.find(v=>v.site==="YouTube"&&v.type==="Trailer");
-if(!vid)return;
-
-heroTrailer.src=`https://www.youtube.com/embed/${vid.key}?autoplay=1&mute=1&controls=0&loop=1&playlist=${vid.key}`;
-heroTrailer.classList.remove("hidden");
-
-},10000);
+    heroTrailer.src=`https://www.youtube.com/embed/${vid.key}?autoplay=1&mute=1&loop=1&playlist=${vid.key}`;
+    heroTrailer.classList.remove("hidden");
+  },8000);
 }
 
 function showDetails(movie){
-currentMovie=movie;
-mainPage.classList.add("hidden");
-detailsPage.classList.remove("hidden");
+  currentMovie=movie;
+  mainPage.classList.add("hidden");
+  detailsPage.classList.remove("hidden");
 
-detailsPoster.src=movie.poster_path
-?`https://image.tmdb.org/t/p/w500${movie.poster_path}`:"";
-
-detailsTitle.textContent=movie.title||movie.name;
-detailsOverview.textContent=movie.overview;
+  detailsPoster.src=`https://image.tmdb.org/t/p/w500${movie.poster_path}`;
+  detailsTitle.textContent=movie.title||movie.name;
+  detailsOverview.textContent=movie.overview;
 }
 
 function closeDetailsPage(){
-detailsPage.classList.add("hidden");
-mainPage.classList.remove("hidden");
+  detailsPage.classList.add("hidden");
+  mainPage.classList.remove("hidden");
 }
 
-function openSearchPage(){
-mainPage.classList.add("hidden");
-searchPage.classList.remove("hidden");
-}
-function closeSearchPage(){
-searchPage.classList.add("hidden");
-mainPage.classList.remove("hidden");
-searchResults.innerHTML="";
-}
+function openSearchPage(){ mainPage.classList.add("hidden"); searchPage.classList.remove("hidden"); }
+function closeSearchPage(){ searchPage.classList.add("hidden"); mainPage.classList.remove("hidden"); }
 
 searchInputFull.addEventListener("input",async e=>{
-const q=e.target.value.trim();
-if(q.length<3)return;
+  const q=e.target.value.trim();
+  if(q.length<3)return;
 
-const res=await fetchMovies(
-`https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(q)}`
-);
+  const res=await fetchMovies(`https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(q)}`);
+  searchResults.innerHTML=res.map(createCard).join('');
 
-searchResults.innerHTML=res.map(createCard).join('');
-
-searchResults.querySelectorAll(".movie-card").forEach((card,i)=>{
-card.onclick=()=>showDetails(res[i]);
-});
+  searchResults.querySelectorAll(".movie-card").forEach((card,i)=>{
+    card.onclick=()=>showDetails(res[i]);
+  });
 });
 
 async function playTrailerFromDetails(){
-const type=currentMovie.title?"movie":"tv";
-const res=await fetch(`https://api.themoviedb.org/3/${type}/${currentMovie.id}/videos?api_key=${API_KEY}`);
-const data=await res.json();
+  const type=currentMovie.title?"movie":"tv";
+  const res=await fetch(`https://api.themoviedb.org/3/${type}/${currentMovie.id}/videos?api_key=${API_KEY}`);
+  const data=await res.json();
 
-const vid=data.results.find(v=>v.type==="Trailer")||data.results[0];
-if(!vid)return alert("No trailer");
+  const vid=data.results.find(v=>v.type==="Trailer")||data.results[0];
+  if(!vid)return alert("No trailer");
 
-trailerFrame.src=`https://www.youtube.com/embed/${vid.key}?autoplay=1`;
-trailerModal.classList.remove("hidden");
+  trailerFrame.src=`https://www.youtube.com/embed/${vid.key}?autoplay=1`;
+  trailerModal.classList.remove("hidden");
 }
 
 function playHeroTrailer(){ playTrailerFromDetails(); }
-
-function closeTrailer(){
-trailerModal.classList.add("hidden");
-trailerFrame.src="";
-}
+function closeTrailer(){ trailerModal.classList.add("hidden"); trailerFrame.src=""; }
 
 function toggleWatchlist(movie){
-const exist=watchlist.find(m=>m.id===movie.id);
-if(exist) watchlist=watchlist.filter(m=>m.id!==movie.id);
-else watchlist.push(movie);
-
-localStorage.setItem("watchlist",JSON.stringify(watchlist));
+  const exist=watchlist.find(m=>m.id===movie.id);
+  if(exist) watchlist=watchlist.filter(m=>m.id!==movie.id);
+  else watchlist.push(movie);
+  localStorage.setItem("watchlist",JSON.stringify(watchlist));
 }
 
 function openWatchlist(){
-mainPage.classList.add("hidden");
-watchlistPage.classList.remove("hidden");
+  mainPage.classList.add("hidden");
+  watchlistPage.classList.remove("hidden");
 
-watchlistGrid.innerHTML=watchlist.map(createCard).join('');
-watchlistGrid.querySelectorAll(".movie-card").forEach((card,i)=>{
-card.onclick=()=>showDetails(watchlist[i]);
-});
+  watchlistGrid.innerHTML=watchlist.map(createCard).join('');
+  watchlistGrid.querySelectorAll(".movie-card").forEach((card,i)=>{
+    card.onclick=()=>showDetails(watchlist[i]);
+  });
 }
 
 function closeWatchlist(){
-watchlistPage.classList.add("hidden");
-mainPage.classList.remove("hidden");
+  watchlistPage.classList.add("hidden");
+  mainPage.classList.remove("hidden");
 }
 
 function openPlatform(platform){
-const title=encodeURIComponent(currentMovie.title||currentMovie.name);
+  const title=encodeURIComponent(currentMovie.title||currentMovie.name);
 
-if(platform==="netflix") window.open(`https://www.netflix.com/search?q=${title}`);
-if(platform==="prime") window.open(`https://www.primevideo.com/search/ref=atv_nb_sr?phrase=${title}`);
-if(platform==="disney") window.open(`https://www.disneyplus.com/search?q=${title}`);
+  if(platform==="netflix") window.open(`https://www.netflix.com/search?q=${title}`);
+  if(platform==="prime") window.open(`https://www.primevideo.com/search/ref=atv_nb_sr?phrase=${title}`);
+  if(platform==="disney") window.open(`https://www.disneyplus.com/search?q=${title}`);
 }
 
 window.onload=loadRows;
