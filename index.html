@@ -11,7 +11,7 @@
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2257272049115568"
 crossorigin="anonymous"></script>
 
-<meta name="description" content="Discover trending movies, anime and TV shows. Watch trailers and explore new releases on MovieHub.">
+<meta name="description" content="Discover trending movies, anime and TV shows. Watch trailers on MovieHub.">
 
 <style>
 body { background:#0a0a0a; color:white; font-family:sans-serif; }
@@ -40,9 +40,6 @@ body { background:#0a0a0a; color:white; font-family:sans-serif; }
   <div class="flex gap-4 text-sm text-gray-400">
     <span onclick="openSearchPage()" class="cursor-pointer">Search</span>
     <span onclick="openWatchlist()" class="cursor-pointer">❤️</span>
-    <span onclick="openPage('about')" class="cursor-pointer">About</span>
-    <span onclick="openPage('contact')" class="cursor-pointer">Contact</span>
-    <span onclick="openPage('privacy')" class="cursor-pointer">Privacy</span>
   </div>
 </nav>
 
@@ -74,18 +71,31 @@ data-full-width-responsive="true"></ins>
     allowfullscreen></iframe>
 </div>
 
-<!-- CONTENT BOOST (VERY IMPORTANT FOR ADSENSE) -->
+<!-- CONTENT -->
 <div class="p-4 text-gray-400 max-w-3xl">
   <h2 class="text-xl mb-2">Discover Movies & Series</h2>
   <p>
   MovieHub is your go-to platform to explore trending movies, anime, and TV shows.
   We provide trailers, ratings, and recommendations to help you find what to watch next.
-  Stay updated with the latest releases and discover exciting content across multiple genres.
+  </p>
+  <p class="mt-2">
+  We aim to provide a smooth and enjoyable browsing experience for movie lovers around the world.
+  Our platform is updated regularly with the latest releases.
   </p>
 </div>
 
 <!-- ROWS -->
 <div id="rows" class="p-4"></div>
+
+<!-- FOOTER (VERY IMPORTANT) -->
+<footer class="p-6 text-center text-gray-400 border-t border-gray-800 mt-10">
+  <div class="flex justify-center gap-6 mb-4">
+    <span onclick="openPage('about')" class="cursor-pointer">About</span>
+    <span onclick="openPage('contact')" class="cursor-pointer">Contact</span>
+    <span onclick="openPage('privacy')" class="cursor-pointer">Privacy Policy</span>
+  </div>
+  <p>© 2026 MovieHub. All rights reserved.</p>
+</footer>
 
 </div>
 
@@ -110,7 +120,6 @@ data-full-width-responsive="true"></ins>
   <h1 id="detailsTitle" class="text-2xl font-bold"></h1>
   <p id="detailsOverview" class="text-gray-400"></p>
 
-  <!-- AD -->
   <div class="my-4 flex justify-center">
     <ins class="adsbygoogle"
     style="display:block"
@@ -147,8 +156,7 @@ let watchlist=JSON.parse(localStorage.getItem("watchlist")||"[]");
 
 const rowsData=[
 {title:"Trending",url:`https://api.themoviedb.org/3/trending/all/week?api_key=${API_KEY}`},
-{title:"Top Rated",url:`https://api.themoviedb.org/3/movie/top_rated?api_key=${API_KEY}`},
-{title:"Action",url:`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=28`}
+{title:"Top Rated",url:`https://api.themoviedb.org/3/movie/top_rated?api_key=${API_KEY}`}
 ];
 
 async function fetchMovies(url){
@@ -162,7 +170,7 @@ async function fetchMovies(url){
 function createCard(movie){
   if(!movie.poster_path) return "";
   return `<div class="movie-card">
-    <img src="https://image.tmdb.org/t/p/w300${movie.poster_path}" class="rounded-lg">
+    <img src="https://image.tmdb.org/t/p/w300${movie.poster_path}" class="rounded">
   </div>`;
 }
 
@@ -172,10 +180,8 @@ async function loadRows(){
     const movies=await fetchMovies(row.url);
 
     const rowDiv=document.createElement("div");
-    rowDiv.innerHTML=`
-    <h2 class="mb-2">${row.title}</h2>
-    <div class="scroll">${movies.map(createCard).join("")}</div>
-    `;
+    rowDiv.innerHTML=`<h2>${row.title}</h2>
+    <div class="scroll">${movies.map(createCard).join("")}</div>`;
 
     rows.appendChild(rowDiv);
 
@@ -189,98 +195,22 @@ async function loadRows(){
   }
 }
 
-async function setHero(movie){
-  currentMovie=movie;
-
-  hero.style.backgroundImage=
-  `linear-gradient(to bottom, rgba(0,0,0,0.7), black),
-  url(https://image.tmdb.org/t/p/original${movie.backdrop_path})`;
-
-  heroTitle.textContent=movie.title||movie.name;
-
-  setTimeout(async ()=>{
-    const type=movie.title?"movie":"tv";
-    const res=await fetch(`https://api.themoviedb.org/3/${type}/${movie.id}/videos?api_key=${API_KEY}`);
-    const data=await res.json();
-
-    const vid=data.results.find(v=>v.type==="Trailer");
-    if(!vid)return;
-
-    heroTrailer.src=`https://www.youtube.com/embed/${vid.key}?autoplay=1&mute=1&loop=1&playlist=${vid.key}`;
-    heroTrailer.classList.remove("hidden");
-  },5000);
-}
-
-function showDetails(movie){
-  currentMovie=movie;
-  mainPage.classList.add("hidden");
-  detailsPage.classList.remove("hidden");
-
-  detailsPoster.src=`https://image.tmdb.org/t/p/w500${movie.poster_path}`;
-  detailsTitle.textContent=movie.title||movie.name;
-  detailsOverview.textContent=movie.overview;
-}
-
-function closeDetailsPage(){
-  detailsPage.classList.add("hidden");
-  mainPage.classList.remove("hidden");
-}
-
-function openSearchPage(){ mainPage.classList.add("hidden"); searchPage.classList.remove("hidden"); }
-function closeSearchPage(){ searchPage.classList.add("hidden"); mainPage.classList.remove("hidden"); }
-
-searchInputFull.addEventListener("input",async e=>{
-  const q=e.target.value.trim();
-  if(q.length<3)return;
-
-  const res=await fetchMovies(`https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(q)}`);
-  searchResults.innerHTML=res.map(createCard).join('');
-
-  searchResults.querySelectorAll(".movie-card").forEach((card,i)=>{
-    card.onclick=()=>showDetails(res[i]);
-  });
-});
-
-function toggleWatchlist(movie){
-  const exist=watchlist.find(m=>m.id===movie.id);
-  if(exist) watchlist=watchlist.filter(m=>m.id!==movie.id);
-  else watchlist.push(movie);
-  localStorage.setItem("watchlist",JSON.stringify(watchlist));
-}
-
-function openWatchlist(){
-  mainPage.classList.add("hidden");
-  watchlistPage.classList.remove("hidden");
-
-  watchlistGrid.innerHTML=watchlist.map(createCard).join('');
-  watchlistGrid.querySelectorAll(".movie-card").forEach((card,i)=>{
-    card.onclick=()=>showDetails(watchlist[i]);
-  });
-}
-
-function closeWatchlist(){
-  watchlistPage.classList.add("hidden");
-  mainPage.classList.remove("hidden");
-}
-
 function openPage(type){
   mainPage.classList.add("hidden");
   infoPage.classList.remove("hidden");
 
   if(type==="about"){
-    infoContent.innerHTML=`<h1 class="text-2xl mb-4">About Us</h1>
-    <p>MovieHub is a platform for discovering movies, anime, and TV shows. We provide trailers, ratings, and recommendations to help users find what to watch.</p>`;
+    infoContent.innerHTML=`<h1>About</h1><p>MovieHub helps users discover movies and trailers.</p>`;
   }
 
   if(type==="contact"){
-    infoContent.innerHTML=`<h1 class="text-2xl mb-4">Contact</h1>
-    <p>You can contact us for inquiries, feedback, or business opportunities.</p>
-    <p>Email: your@email.com</p>`;
+    infoContent.innerHTML=`<h1>Contact</h1>
+    <p>Email: eh710214@gmail.com</p>`;
   }
 
   if(type==="privacy"){
-    infoContent.innerHTML=`<h1 class="text-2xl mb-4">Privacy Policy</h1>
-    <p>We do not collect personal data. Third-party services like ads may use cookies to improve user experience.</p>`;
+    infoContent.innerHTML=`<h1>Privacy Policy</h1>
+    <p>We do not collect personal data. Ads may use cookies.</p>`;
   }
 }
 
@@ -288,21 +218,6 @@ function closeInfoPage(){
   infoPage.classList.add("hidden");
   mainPage.classList.remove("hidden");
 }
-
-async function playTrailerFromDetails(){
-  const type=currentMovie.title?"movie":"tv";
-  const res=await fetch(`https://api.themoviedb.org/3/${type}/${currentMovie.id}/videos?api_key=${API_KEY}`);
-  const data=await res.json();
-
-  const vid=data.results.find(v=>v.type==="Trailer")||data.results[0];
-  if(!vid)return alert("No trailer");
-
-  trailerFrame.src=`https://www.youtube.com/embed/${vid.key}?autoplay=1`;
-  trailerModal.classList.remove("hidden");
-}
-
-function playHeroTrailer(){ playTrailerFromDetails(); }
-function closeTrailer(){ trailerModal.classList.add("hidden"); trailerFrame.src=""; }
 
 window.onload=loadRows;
 </script>
