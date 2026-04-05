@@ -68,12 +68,6 @@ class="w-full bg-gray-900 border border-gray-600 px-4 py-3 rounded text-white mb
 <div id="recommendations" class="scroll mt-3"></div>
 </div>
 
-<!-- EXTRA PAGES -->
-<div id="extraPage" class="searchPage pt-20 px-6">
-<button onclick="closeExtraPage()" class="mb-4 bg-gray-700 px-4 py-2 rounded">← Back</button>
-<div id="extraContent" class="max-w-3xl mx-auto text-gray-300 leading-7"></div>
-</div>
-
 <!-- HOME -->
 <div id="homePage">
 
@@ -145,12 +139,11 @@ class="w-full bg-gray-900 border border-gray-600 px-4 py-3 rounded text-white mb
 const API_KEY="2b670b583329b90bcbad43227626c5f9";
 let heroMovie;
 
-// NAV CONTROL
+// HOME NAV
 function goHome(){
- document.getElementById("homePage").style.display="block";
+ homePage.style.display="block";
  moviePage.style.display="none";
  searchPage.style.display="none";
- extraPage.style.display="none";
 }
 
 // SEARCH
@@ -222,9 +215,9 @@ async function openMovie(m){
  const providers=await getProviders(m.id);
  const recs=await getRecommendations(m.id);
 
- const hasNetflix = providers.some(p=>p.provider_name==="Netflix");
- const hasPrime = providers.some(p=>p.provider_name==="Amazon Prime Video");
- const hasDisney = providers.some(p=>p.provider_name==="Disney Plus");
+ const netflix = providers.find(p=>p.provider_name==="Netflix");
+ const prime = providers.find(p=>p.provider_name==="Amazon Prime Video");
+ const disney = providers.find(p=>p.provider_name==="Disney Plus");
 
  movieDetails.innerHTML=`
  <div class="flex flex-col md:flex-row gap-6">
@@ -238,16 +231,19 @@ async function openMovie(m){
 
  <div class="flex gap-3 mb-4 flex-wrap">
 
- <button class="${hasNetflix ? 'bg-red-600' : 'bg-gray-600 opacity-50'} px-4 py-2 rounded">
- ${hasNetflix ? 'Watch on Netflix' : 'Not on Netflix'}
+ <button onclick="${netflix ? `window.open('https://www.netflix.com/search?q=${m.title}')` : ''}"
+ class="${netflix ? 'bg-red-600' : 'bg-gray-600 opacity-50'} px-4 py-2 rounded">
+ ${netflix ? 'Watch on Netflix' : 'Not on Netflix'}
  </button>
 
- <button class="${hasPrime ? 'bg-blue-600' : 'bg-gray-600 opacity-50'} px-4 py-2 rounded">
- ${hasPrime ? 'Watch on Prime' : 'Not on Prime'}
+ <button onclick="${prime ? `window.open('https://www.primevideo.com/search?phrase=${m.title}')` : ''}"
+ class="${prime ? 'bg-blue-600' : 'bg-gray-600 opacity-50'} px-4 py-2 rounded">
+ ${prime ? 'Watch on Prime' : 'Not on Prime'}
  </button>
 
- <button class="${hasDisney ? 'bg-indigo-600' : 'bg-gray-600 opacity-50'} px-4 py-2 rounded">
- ${hasDisney ? 'Watch on Disney+' : 'Not on Disney+'}
+ <button onclick="${disney ? `window.open('https://www.disneyplus.com/search?q=${m.title}')` : ''}"
+ class="${disney ? 'bg-indigo-600' : 'bg-gray-600 opacity-50'} px-4 py-2 rounded">
+ ${disney ? 'Watch on Disney+' : 'Not on Disney+'}
  </button>
 
  </div>
@@ -279,45 +275,6 @@ function closeMoviePage(){
  homePage.style.display="block";
 }
 
-// LEGAL PAGES (FULLY FIXED + LONG)
-function openPage(type){
-
- extraPage.style.display="block";
- homePage.style.display="none";
-
- if(type==="policy"){
-  extraContent.innerHTML=`
-  <h1 class="text-3xl mb-4">Privacy Policy</h1>
-  <p>We collect user data such as email, usage activity, and preferences to improve recommendations and services.</p>
-  <p class="mt-4">Your data is never sold. It may be shared with trusted services like analytics and hosting providers.</p>
-  <p class="mt-4">We use cookies to enhance experience. You can disable cookies in your browser.</p>
-  <p class="mt-4">Users can request deletion of their data anytime via email.</p>
-  `;
- }
-
- if(type==="terms"){
-  extraContent.innerHTML=`
-  <h1 class="text-3xl mb-4">Terms & Conditions</h1>
-  <p>MovieHub provides movie discovery and trailers only. We do not host movies.</p>
-  <p class="mt-4">Users must not misuse the platform or violate copyright laws.</p>
-  <p class="mt-4">We may update services anytime without notice.</p>
-  `;
- }
-
- if(type==="contact"){
-  extraContent.innerHTML=`
-  <h1 class="text-3xl mb-4">Contact Us</h1>
-  <p>Email: eh710214@gmail.com</p>
-  <p class="mt-2">Phone: +2349049696168</p>
-  `;
- }
-}
-
-function closeExtraPage(){
- extraPage.style.display="none";
- homePage.style.display="block";
-}
-
 // LOAD
 async function load(){
 
@@ -336,6 +293,29 @@ async function load(){
  <img src="https://image.tmdb.org/t/p/w300${m.poster_path}">
  </div>`).join("");
 
+ // ✅ GENRES FIXED
+ const genres=[
+ ["Action",28],["Comedy",35],["Horror",27],
+ ["Sci-Fi",878],["Romance",10749],
+ ["Drama",18],["Animation",16],
+ ["Thriller",53],["Crime",80],["Adventure",12]
+ ];
+
+ rows.innerHTML="";
+
+ for(const [name,id] of genres){
+  const res=await fetch(`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=${id}`);
+  const data=await res.json();
+
+  rows.innerHTML+=`
+  <h2 class="mt-4 font-bold">${name}</h2>
+  <div class="scroll mb-4">
+  ${data.results.map(m=>`
+   <div class="card" onclick='openMovie(${JSON.stringify(m)})'>
+   <img src="https://image.tmdb.org/t/p/w300${m.poster_path}">
+   </div>`).join("")}
+  </div>`;
+ }
 }
 
 window.onload=load;
