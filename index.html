@@ -11,22 +11,30 @@
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2257272049115568"
 crossorigin="anonymous"></script>
 
-<meta name="description" content="Discover trending movies, anime and TV shows. Watch trailers on MovieHub.">
-
 <style>
 body { background:#0a0a0a; color:white; font-family:sans-serif; }
-.scroll { display:flex; overflow-x:auto; gap:12px; }
+
+.scroll {
+  display:flex;
+  overflow-x:auto;
+  gap:20px;
+  padding-bottom:10px;
+}
 .scroll::-webkit-scrollbar { display:none; }
-.movie-card { min-width:150px; cursor:pointer; transition:0.3s; }
+
+.movie-card {
+  min-width:180px;
+  cursor:pointer;
+  transition:0.3s;
+}
 .movie-card:hover { transform:scale(1.1); }
 
 .hero {
-  height:55vh;
+  height:60vh;
   display:flex;
   align-items:flex-end;
-  padding:30px;
+  padding:40px;
   background-size:cover;
-  position:relative;
 }
 </style>
 </head>
@@ -35,113 +43,73 @@ body { background:#0a0a0a; color:white; font-family:sans-serif; }
 
 <!-- NAV -->
 <nav class="fixed top-0 w-full bg-black/90 p-4 flex justify-between items-center z-50">
-  <h1 class="text-2xl font-bold">🎬 MovieHub</h1>
-
-  <div class="flex gap-4 text-sm text-gray-400">
+  <h1 class="text-3xl font-bold">🎬 MovieHub</h1>
+  <div class="flex gap-6 text-base text-gray-300">
     <span onclick="openSearchPage()" class="cursor-pointer">Search</span>
-    <span onclick="openWatchlist()" class="cursor-pointer">❤️</span>
+    <span onclick="openWatchlist()" class="cursor-pointer">❤️ Watchlist</span>
   </div>
 </nav>
 
-<div id="mainPage" class="pt-16">
-
-<!-- TOP AD -->
-<div class="p-4 flex justify-center">
-<ins class="adsbygoogle"
-style="display:block"
-data-ad-client="ca-pub-2257272049115568"
-data-ad-slot="1234567890"
-data-ad-format="auto"
-data-full-width-responsive="true"></ins>
-</div>
-<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+<div id="mainPage" class="pt-20">
 
 <!-- HERO -->
 <div id="hero" class="hero">
   <div>
-    <h1 id="heroTitle" class="text-4xl font-bold mb-3"></h1>
-    <button onclick="playHeroTrailer()" class="bg-white text-black px-6 py-3 rounded-xl">
+    <h1 id="heroTitle" class="text-5xl font-bold mb-4"></h1>
+    <button onclick="playHeroTrailer()" class="bg-white text-black px-6 py-3 rounded-xl text-lg">
       ▶ Watch Trailer
     </button>
   </div>
-
-  <iframe id="heroTrailer"
-    class="absolute inset-0 w-full h-full hidden"
-    allow="autoplay; encrypted-media"
-    allowfullscreen></iframe>
 </div>
 
 <!-- CONTENT -->
-<div class="p-4 text-gray-400 max-w-3xl">
-  <h2 class="text-xl mb-2">Discover Movies & Series</h2>
+<div class="p-6 text-gray-300 max-w-4xl text-lg">
+  <h2 class="text-2xl mb-3 font-semibold">Discover Movies & Series</h2>
   <p>
-  MovieHub is your go-to platform to explore trending movies, anime, and TV shows.
-  We provide trailers, ratings, and recommendations to help you find what to watch next.
+  MovieHub helps you explore trending movies, anime, and TV shows. Watch trailers,
+  discover new releases, and find your next favorite content easily.
   </p>
   <p class="mt-2">
   We aim to provide a smooth and enjoyable browsing experience for movie lovers around the world.
-  Our platform is updated regularly with the latest releases.
   </p>
 </div>
 
 <!-- ROWS -->
-<div id="rows" class="p-4"></div>
+<div id="rows" class="px-6"></div>
 
-<!-- FOOTER (VERY IMPORTANT) -->
-<footer class="p-6 text-center text-gray-400 border-t border-gray-800 mt-10">
-  <div class="flex justify-center gap-6 mb-4">
-    <span onclick="openPage('about')" class="cursor-pointer">About</span>
-    <span onclick="openPage('contact')" class="cursor-pointer">Contact</span>
-    <span onclick="openPage('privacy')" class="cursor-pointer">Privacy Policy</span>
+<!-- FOOTER -->
+<footer class="mt-16 p-8 border-t border-gray-800 text-center text-gray-400">
+  <div class="flex justify-center gap-8 mb-6 text-lg">
+    <span onclick="openPage('about')" class="cursor-pointer hover:text-white">About</span>
+    <span onclick="openPage('contact')" class="cursor-pointer hover:text-white">Contact</span>
+    <span onclick="openPage('privacy')" class="cursor-pointer hover:text-white">Privacy Policy</span>
   </div>
-  <p>© 2026 MovieHub. All rights reserved.</p>
+  <p class="text-sm">Contact: eh710214@gmail.com</p>
+  <p class="mt-2 text-sm">© 2026 MovieHub. All rights reserved.</p>
 </footer>
 
 </div>
 
-<!-- SEARCH -->
-<div id="searchPage" class="hidden fixed inset-0 bg-black p-4 z-50">
-  <button onclick="closeSearchPage()">←</button>
-  <input id="searchInputFull" class="w-full p-3 my-4 bg-zinc-800 rounded" placeholder="Search movies...">
-  <div id="searchResults" class="grid grid-cols-2 md:grid-cols-5 gap-4"></div>
-</div>
-
-<!-- WATCHLIST -->
-<div id="watchlistPage" class="hidden fixed inset-0 bg-black p-6 z-50">
-  <button onclick="closeWatchlist()">←</button>
-  <h1 class="text-2xl mb-4">My Watchlist</h1>
-  <div id="watchlistGrid" class="grid grid-cols-2 md:grid-cols-5 gap-4"></div>
-</div>
-
 <!-- DETAILS -->
-<div id="detailsPage" class="hidden fixed inset-0 bg-black p-6 z-50">
-  <button onclick="closeDetailsPage()">←</button>
-  <img id="detailsPoster" class="w-56 rounded my-4">
-  <h1 id="detailsTitle" class="text-2xl font-bold"></h1>
-  <p id="detailsOverview" class="text-gray-400"></p>
+<div id="detailsPage" class="hidden fixed inset-0 bg-black p-6 z-50 overflow-auto">
+  <button onclick="closeDetailsPage()" class="text-2xl">←</button>
+  <img id="detailsPoster" class="w-64 rounded my-6">
+  <h1 id="detailsTitle" class="text-3xl font-bold mb-2"></h1>
+  <p id="detailsOverview" class="text-gray-400 text-lg"></p>
 
-  <div class="my-4 flex justify-center">
-    <ins class="adsbygoogle"
-    style="display:block"
-    data-ad-client="ca-pub-2257272049115568"
-    data-ad-slot="1234567890"
-    data-ad-format="auto"></ins>
-  </div>
-  <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-
-  <div class="flex gap-3 mt-4 flex-wrap">
-    <button onclick="playTrailerFromDetails()" class="bg-red-600 px-5 py-3 rounded">▶ Trailer</button>
-    <button onclick="toggleWatchlist(currentMovie)" class="bg-white text-black px-5 py-3 rounded">❤️ Save</button>
+  <div class="flex gap-4 mt-6">
+    <button onclick="playTrailerFromDetails()" class="bg-red-600 px-6 py-3 rounded text-lg">▶ Trailer</button>
+    <button onclick="toggleWatchlist(currentMovie)" class="bg-white text-black px-6 py-3 rounded text-lg">❤️ Save</button>
   </div>
 </div>
 
-<!-- INFO PAGES -->
-<div id="infoPage" class="hidden fixed inset-0 bg-black p-6 z-50 overflow-auto">
-  <button onclick="closeInfoPage()">← Back</button>
-  <div id="infoContent" class="mt-6 text-gray-300"></div>
+<!-- INFO PAGE -->
+<div id="infoPage" class="hidden fixed inset-0 bg-black p-8 z-50 overflow-auto">
+  <button onclick="closeInfoPage()" class="text-2xl mb-6">← Back</button>
+  <div id="infoContent" class="text-lg leading-relaxed"></div>
 </div>
 
-<!-- TRAILER -->
+<!-- TRAILER MODAL -->
 <div id="trailerModal" class="hidden fixed inset-0 bg-black/90 flex items-center justify-center z-50">
   <div class="w-full max-w-3xl relative">
     <button onclick="closeTrailer()" class="absolute -top-10 right-0 text-2xl">✕</button>
@@ -160,17 +128,15 @@ const rowsData=[
 ];
 
 async function fetchMovies(url){
-  try{
-    const res=await fetch(url);
-    const data=await res.json();
-    return data.results||[];
-  }catch(e){ return []; }
+  const res=await fetch(url);
+  const data=await res.json();
+  return data.results||[];
 }
 
 function createCard(movie){
   if(!movie.poster_path) return "";
   return `<div class="movie-card">
-    <img src="https://image.tmdb.org/t/p/w300${movie.poster_path}" class="rounded">
+    <img src="https://image.tmdb.org/t/p/w300${movie.poster_path}" class="rounded-xl">
   </div>`;
 }
 
@@ -179,13 +145,17 @@ async function loadRows(){
   for(let row of rowsData){
     const movies=await fetchMovies(row.url);
 
-    const rowDiv=document.createElement("div");
-    rowDiv.innerHTML=`<h2>${row.title}</h2>
-    <div class="scroll">${movies.map(createCard).join("")}</div>`;
+    const section=document.createElement("div");
+    section.className="mb-10";
 
-    rows.appendChild(rowDiv);
+    section.innerHTML=`
+      <h2 class="text-2xl mb-4 font-semibold">${row.title}</h2>
+      <div class="scroll">${movies.map(createCard).join("")}</div>
+    `;
 
-    rowDiv.querySelectorAll(".movie-card").forEach((card,i)=>{
+    rows.appendChild(section);
+
+    section.querySelectorAll(".movie-card").forEach((card,i)=>{
       card.onclick=()=>showDetails(movies[i]);
     });
 
@@ -195,22 +165,56 @@ async function loadRows(){
   }
 }
 
+function setHero(movie){
+  currentMovie=movie;
+  hero.style.backgroundImage=`linear-gradient(to bottom, rgba(0,0,0,0.6), black),
+  url(https://image.tmdb.org/t/p/original${movie.backdrop_path})`;
+  heroTitle.textContent=movie.title||movie.name;
+}
+
+function showDetails(movie){
+  currentMovie=movie;
+  mainPage.classList.add("hidden");
+  detailsPage.classList.remove("hidden");
+
+  detailsPoster.src=`https://image.tmdb.org/t/p/w500${movie.poster_path}`;
+  detailsTitle.textContent=movie.title||movie.name;
+  detailsOverview.textContent=movie.overview;
+}
+
+function closeDetailsPage(){
+  detailsPage.classList.add("hidden");
+  mainPage.classList.remove("hidden");
+}
+
+function toggleWatchlist(movie){
+  const exist=watchlist.find(m=>m.id===movie.id);
+  if(exist) watchlist=watchlist.filter(m=>m.id!==movie.id);
+  else watchlist.push(movie);
+
+  localStorage.setItem("watchlist",JSON.stringify(watchlist));
+}
+
 function openPage(type){
   mainPage.classList.add("hidden");
   infoPage.classList.remove("hidden");
 
   if(type==="about"){
-    infoContent.innerHTML=`<h1>About</h1><p>MovieHub helps users discover movies and trailers.</p>`;
+    infoContent.innerHTML=`
+    <h1 class="text-3xl mb-6 font-bold">About MovieHub</h1>
+    <p>MovieHub is a platform to discover movies, trailers, and trending entertainment content worldwide.</p>`;
   }
 
   if(type==="contact"){
-    infoContent.innerHTML=`<h1>Contact</h1>
+    infoContent.innerHTML=`
+    <h1 class="text-3xl mb-6 font-bold">Contact</h1>
     <p>Email: eh710214@gmail.com</p>`;
   }
 
   if(type==="privacy"){
-    infoContent.innerHTML=`<h1>Privacy Policy</h1>
-    <p>We do not collect personal data. Ads may use cookies.</p>`;
+    infoContent.innerHTML=`
+    <h1 class="text-3xl mb-6 font-bold">Privacy Policy</h1>
+    <p>We do not collect personal data. Ads may use cookies for better experience.</p>`;
   }
 }
 
@@ -218,6 +222,21 @@ function closeInfoPage(){
   infoPage.classList.add("hidden");
   mainPage.classList.remove("hidden");
 }
+
+async function playTrailerFromDetails(){
+  const type=currentMovie.title?"movie":"tv";
+  const res=await fetch(`https://api.themoviedb.org/3/${type}/${currentMovie.id}/videos?api_key=${API_KEY}`);
+  const data=await res.json();
+
+  const vid=data.results.find(v=>v.type==="Trailer")||data.results[0];
+  if(!vid)return alert("No trailer available");
+
+  trailerFrame.src=`https://www.youtube.com/embed/${vid.key}?autoplay=1`;
+  trailerModal.classList.remove("hidden");
+}
+
+function playHeroTrailer(){ playTrailerFromDetails(); }
+function closeTrailer(){ trailerModal.classList.add("hidden"); trailerFrame.src=""; }
 
 window.onload=loadRows;
 </script>
