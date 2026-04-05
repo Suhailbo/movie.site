@@ -103,9 +103,12 @@ class="w-full bg-gray-900 border border-gray-600 px-4 py-3 rounded text-white mb
 </div>
 
 <div>
-<h3 class="text-white mb-3">Links</h3>
 <ul class="space-y-2 text-gray-400">
 <li onclick="goHome()">Home</li>
+<li onclick="openPage('policy')">Privacy Policy</li>
+<li onclick="openPage('terms')">Terms of Service</li>
+<li onclick="openPage('contact')">Support</li>
+<li onclick="openPage('disclaimer')">Disclaimer</li>
 </ul>
 </div>
 
@@ -311,7 +314,66 @@ async function load(){
  }
 
 }
+function openPage(type){
 
+ extraPage.style.display="block";
+ homePage.style.display="none";
+ moviePage.style.display="none";
+ searchPage.style.display="none";
+
+ // PRIVACY
+ if(type==="policy"){
+  extraContent.innerHTML=`
+  <h1 class="text-3xl mb-4 font-bold">Privacy Policy</h1>
+
+  <p><b>Effective Date:</b> April 5, 2026</p>
+
+  <p class="mt-4">We collect your email, activity, and preferences to improve MovieHub.</p>
+
+  <p class="mt-4">We do NOT sell your data.</p>
+
+  <p class="mt-4">You can request deletion anytime.</p>
+
+  <p class="mt-4">Contact: eh710214@gmail.com</p>
+  `;
+ }
+
+ // TERMS
+ if(type==="terms"){
+  extraContent.innerHTML=`
+  <h1 class="text-3xl mb-4 font-bold">Terms of Service</h1>
+
+  <p>You must use MovieHub legally.</p>
+
+  <p class="mt-4">We only show trailers, we do not host movies.</p>
+
+  <p class="mt-4">We are not responsible for external platforms.</p>
+  `;
+ }
+
+ // SUPPORT
+ if(type==="contact"){
+  extraContent.innerHTML=`
+  <h1 class="text-3xl mb-4 font-bold">Support</h1>
+
+  <p class="mt-4">Contact: eh710214@gmail.com</p>
+  <p class="mt-2">Phone: +2349049696168</p>
+
+  <p class="mt-4">For support, privacy issues, or copyright concerns, email us anytime.</p>
+  `;
+ }
+
+ // DISCLAIMER
+ if(type==="disclaimer"){
+  extraContent.innerHTML=`
+  <h1 class="text-3xl mb-4 font-bold">Disclaimer</h1>
+
+  <p>MovieHub does NOT host any movies.</p>
+
+  <p class="mt-4">All content belongs to their respective owners.</p>
+  `;
+ }
+}
 window.onload=load;
 
 </script>
