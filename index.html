@@ -4,11 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MovieHub</title>
+
 <script src="https://cdn.tailwindcss.com"></script>
 
 <!-- AdSense -->
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2257272049115568"
 crossorigin="anonymous"></script>
+
+<meta name="description" content="Discover trending movies, anime and TV shows. Watch trailers and explore new releases on MovieHub.">
 
 <style>
 body { background:#0a0a0a; color:white; font-family:sans-serif; }
@@ -16,8 +19,9 @@ body { background:#0a0a0a; color:white; font-family:sans-serif; }
 .scroll::-webkit-scrollbar { display:none; }
 .movie-card { min-width:150px; cursor:pointer; transition:0.3s; }
 .movie-card:hover { transform:scale(1.1); }
+
 .hero {
-  height:65vh;
+  height:55vh;
   display:flex;
   align-items:flex-end;
   padding:30px;
@@ -31,11 +35,14 @@ body { background:#0a0a0a; color:white; font-family:sans-serif; }
 
 <!-- NAV -->
 <nav class="fixed top-0 w-full bg-black/90 p-4 flex justify-between items-center z-50">
-  <h1 class="text-2xl font-bold">MovieHub ❤️</h1>
-  <div class="flex gap-3">
-    <button onclick="openWatchlist()">❤️</button>
-    <input onclick="openSearchPage()" placeholder="Search..."
-      class="bg-zinc-800 px-4 py-2 rounded-full cursor-pointer">
+  <h1 class="text-2xl font-bold">🎬 MovieHub</h1>
+
+  <div class="flex gap-4 text-sm text-gray-400">
+    <span onclick="openSearchPage()" class="cursor-pointer">Search</span>
+    <span onclick="openWatchlist()" class="cursor-pointer">❤️</span>
+    <span onclick="openPage('about')" class="cursor-pointer">About</span>
+    <span onclick="openPage('contact')" class="cursor-pointer">Contact</span>
+    <span onclick="openPage('privacy')" class="cursor-pointer">Privacy</span>
   </div>
 </nav>
 
@@ -67,6 +74,16 @@ data-full-width-responsive="true"></ins>
     allowfullscreen></iframe>
 </div>
 
+<!-- CONTENT BOOST (VERY IMPORTANT FOR ADSENSE) -->
+<div class="p-4 text-gray-400 max-w-3xl">
+  <h2 class="text-xl mb-2">Discover Movies & Series</h2>
+  <p>
+  MovieHub is your go-to platform to explore trending movies, anime, and TV shows.
+  We provide trailers, ratings, and recommendations to help you find what to watch next.
+  Stay updated with the latest releases and discover exciting content across multiple genres.
+  </p>
+</div>
+
 <!-- ROWS -->
 <div id="rows" class="p-4"></div>
 
@@ -75,7 +92,7 @@ data-full-width-responsive="true"></ins>
 <!-- SEARCH -->
 <div id="searchPage" class="hidden fixed inset-0 bg-black p-4 z-50">
   <button onclick="closeSearchPage()">←</button>
-  <input id="searchInputFull" class="w-full p-3 my-4 bg-zinc-800 rounded" placeholder="Search...">
+  <input id="searchInputFull" class="w-full p-3 my-4 bg-zinc-800 rounded" placeholder="Search movies...">
   <div id="searchResults" class="grid grid-cols-2 md:grid-cols-5 gap-4"></div>
 </div>
 
@@ -106,11 +123,13 @@ data-full-width-responsive="true"></ins>
   <div class="flex gap-3 mt-4 flex-wrap">
     <button onclick="playTrailerFromDetails()" class="bg-red-600 px-5 py-3 rounded">▶ Trailer</button>
     <button onclick="toggleWatchlist(currentMovie)" class="bg-white text-black px-5 py-3 rounded">❤️ Save</button>
-
-    <button onclick="openPlatform('netflix')" class="bg-red-700 px-4 py-2 rounded">Netflix</button>
-    <button onclick="openPlatform('prime')" class="bg-blue-600 px-4 py-2 rounded">Prime</button>
-    <button onclick="openPlatform('disney')" class="bg-indigo-600 px-4 py-2 rounded">Disney+</button>
   </div>
+</div>
+
+<!-- INFO PAGES -->
+<div id="infoPage" class="hidden fixed inset-0 bg-black p-6 z-50 overflow-auto">
+  <button onclick="closeInfoPage()">← Back</button>
+  <div id="infoContent" class="mt-6 text-gray-300"></div>
 </div>
 
 <!-- TRAILER -->
@@ -129,9 +148,7 @@ let watchlist=JSON.parse(localStorage.getItem("watchlist")||"[]");
 const rowsData=[
 {title:"Trending",url:`https://api.themoviedb.org/3/trending/all/week?api_key=${API_KEY}`},
 {title:"Top Rated",url:`https://api.themoviedb.org/3/movie/top_rated?api_key=${API_KEY}`},
-{title:"Action",url:`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=28`},
-{title:"Anime",url:`https://api.themoviedb.org/3/discover/tv?api_key=${API_KEY}&with_original_language=ja`},
-{title:"K-Drama",url:`https://api.themoviedb.org/3/discover/tv?api_key=${API_KEY}&with_origin_country=KR`}
+{title:"Action",url:`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=28`}
 ];
 
 async function fetchMovies(url){
@@ -145,7 +162,7 @@ async function fetchMovies(url){
 function createCard(movie){
   if(!movie.poster_path) return "";
   return `<div class="movie-card">
-    <img src="https://image.tmdb.org/t/p/w300${movie.poster_path}" class="rounded">
+    <img src="https://image.tmdb.org/t/p/w300${movie.poster_path}" class="rounded-lg">
   </div>`;
 }
 
@@ -187,11 +204,11 @@ async function setHero(movie){
     const data=await res.json();
 
     const vid=data.results.find(v=>v.type==="Trailer");
-    if(!vid) return;
+    if(!vid)return;
 
     heroTrailer.src=`https://www.youtube.com/embed/${vid.key}?autoplay=1&mute=1&loop=1&playlist=${vid.key}`;
     heroTrailer.classList.remove("hidden");
-  },8000);
+  },5000);
 }
 
 function showDetails(movie){
@@ -224,21 +241,6 @@ searchInputFull.addEventListener("input",async e=>{
   });
 });
 
-async function playTrailerFromDetails(){
-  const type=currentMovie.title?"movie":"tv";
-  const res=await fetch(`https://api.themoviedb.org/3/${type}/${currentMovie.id}/videos?api_key=${API_KEY}`);
-  const data=await res.json();
-
-  const vid=data.results.find(v=>v.type==="Trailer")||data.results[0];
-  if(!vid)return alert("No trailer");
-
-  trailerFrame.src=`https://www.youtube.com/embed/${vid.key}?autoplay=1`;
-  trailerModal.classList.remove("hidden");
-}
-
-function playHeroTrailer(){ playTrailerFromDetails(); }
-function closeTrailer(){ trailerModal.classList.add("hidden"); trailerFrame.src=""; }
-
 function toggleWatchlist(movie){
   const exist=watchlist.find(m=>m.id===movie.id);
   if(exist) watchlist=watchlist.filter(m=>m.id!==movie.id);
@@ -261,13 +263,46 @@ function closeWatchlist(){
   mainPage.classList.remove("hidden");
 }
 
-function openPlatform(platform){
-  const title=encodeURIComponent(currentMovie.title||currentMovie.name);
+function openPage(type){
+  mainPage.classList.add("hidden");
+  infoPage.classList.remove("hidden");
 
-  if(platform==="netflix") window.open(`https://www.netflix.com/search?q=${title}`);
-  if(platform==="prime") window.open(`https://www.primevideo.com/search/ref=atv_nb_sr?phrase=${title}`);
-  if(platform==="disney") window.open(`https://www.disneyplus.com/search?q=${title}`);
+  if(type==="about"){
+    infoContent.innerHTML=`<h1 class="text-2xl mb-4">About Us</h1>
+    <p>MovieHub is a platform for discovering movies, anime, and TV shows. We provide trailers, ratings, and recommendations to help users find what to watch.</p>`;
+  }
+
+  if(type==="contact"){
+    infoContent.innerHTML=`<h1 class="text-2xl mb-4">Contact</h1>
+    <p>You can contact us for inquiries, feedback, or business opportunities.</p>
+    <p>Email: your@email.com</p>`;
+  }
+
+  if(type==="privacy"){
+    infoContent.innerHTML=`<h1 class="text-2xl mb-4">Privacy Policy</h1>
+    <p>We do not collect personal data. Third-party services like ads may use cookies to improve user experience.</p>`;
+  }
 }
+
+function closeInfoPage(){
+  infoPage.classList.add("hidden");
+  mainPage.classList.remove("hidden");
+}
+
+async function playTrailerFromDetails(){
+  const type=currentMovie.title?"movie":"tv";
+  const res=await fetch(`https://api.themoviedb.org/3/${type}/${currentMovie.id}/videos?api_key=${API_KEY}`);
+  const data=await res.json();
+
+  const vid=data.results.find(v=>v.type==="Trailer")||data.results[0];
+  if(!vid)return alert("No trailer");
+
+  trailerFrame.src=`https://www.youtube.com/embed/${vid.key}?autoplay=1`;
+  trailerModal.classList.remove("hidden");
+}
+
+function playHeroTrailer(){ playTrailerFromDetails(); }
+function closeTrailer(){ trailerModal.classList.add("hidden"); trailerFrame.src=""; }
 
 window.onload=loadRows;
 </script>
