@@ -1,84 +1,332 @@
-‎<!DOCTYPE html>
+‎‎<!DOCTYPE html>
 ‎<html lang="en">
 ‎<head>
 ‎  <meta charset="UTF-8">
-‎  <title>MovieHub</title>
-‎
+‎  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+‎  <title>MovieHub • Premium</title>
+‎  
+‎  <!-- Tailwind CSS CDN -->
+‎  <script src="https://cdn.tailwindcss.com"></script>
+‎  <!-- Font Awesome -->
+‎  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+‎  
 ‎  <style>
+‎    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+‎    
+‎    :root {
+‎      --primary: #e11d48;
+‎    }
+‎    
 ‎    body {
-‎      background: #0f0f0f;
-‎      color: white;
-‎      font-family: Arial;
-‎      margin: 0;
+‎      font-family: 'Inter', system-ui, sans-serif;
+‎      background: #0a0a0a;
+‎      color: #f1f1f1;
 ‎    }
-‎
-‎    h1 {
-‎      text-align: center;
-‎      padding: 20px;
+‎    
+‎    .hero {
+‎      background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.85)), 
+‎                  url('https://image.tmdb.org/t/p/original/8cdWjvZQUExUUTzyp4t1vYq1c2R.jpg') center/cover no-repeat;
+‎      height: 85vh;
+‎      position: relative;
 ‎    }
-‎
-‎    .movies {
-‎      display: grid;
-‎      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-‎      gap: 15px;
-‎      padding: 20px;
+‎    
+‎    .glass {
+‎      background: rgba(255, 255, 255, 0.08);
+‎      backdrop-filter: blur(20px);
+‎      border: 1px solid rgba(255,255,255,0.1);
 ‎    }
-‎
-‎    .movie {
-‎      background: #1c1c1c;
-‎      border-radius: 10px;
+‎    
+‎    .movie-card {
+‎      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 ‎      overflow: hidden;
-‎      transition: 0.3s;
 ‎    }
-‎
-‎    .movie:hover {
-‎      transform: scale(1.05);
+‎    
+‎    .movie-card:hover {
+‎      transform: translateY(-12px) scale(1.04);
+‎      box-shadow: 0 25px 50px -12px rgb(225 29 72 / 0.4);
 ‎    }
-‎
-‎    img {
-‎      width: 100%;
+‎    
+‎    .movie-card img {
+‎      transition: transform 0.6s ease;
 ‎    }
-‎
-‎    .info {
-‎      padding: 10px;
+‎    
+‎    .movie-card:hover img {
+‎      transform: scale(1.12);
+‎    }
+‎    
+‎    .rating {
+‎      background: rgba(0,0,0,0.7);
+‎      padding: 2px 8px;
+‎      border-radius: 9999px;
+‎      font-size: 0.8rem;
+‎    }
+‎    
+‎    .section-title {
+‎      position: relative;
+‎      display: inline-block;
+‎    }
+‎    
+‎    .section-title:after {
+‎      content: '';
+‎      position: absolute;
+‎      bottom: -6px;
+‎      left: 0;
+‎      width: 60%;
+‎      height: 3px;
+‎      background: var(--primary);
+‎      border-radius: 9999px;
+‎    }
+‎    
+‎    .scroll-container {
+‎      scrollbar-width: none;
+‎    }
+‎    
+‎    .scroll-container::-webkit-scrollbar {
+‎      display: none;
 ‎    }
 ‎  </style>
 ‎</head>
-‎<body>
+‎<body class="min-h-screen pb-12">
 ‎
-‎<h1>🔥 MovieHub</h1>
+‎  <!-- NAVBAR -->
+‎  <nav class="fixed top-0 left-0 right-0 z-50 glass border-b border-white/10">
+‎    <div class="max-w-screen-2xl mx-auto px-8 py-5 flex items-center justify-between">
+‎      <div class="flex items-center gap-10">
+‎        <div class="flex items-center gap-3">
+‎          <div class="w-9 h-9 bg-rose-600 rounded-2xl flex items-center justify-center text-white font-bold text-2xl">M</div>
+‎          <h1 class="text-3xl font-bold tracking-tighter">MovieHub</h1>
+‎        </div>
+‎        
+‎        <div class="hidden md:flex items-center gap-8 text-sm font-medium">
+‎          <a href="#" class="hover:text-rose-400 transition-colors">Trending</a>
+‎          <a href="#" class="hover:text-rose-400 transition-colors">Popular</a>
+‎          <a href="#" class="hover:text-rose-400 transition-colors">Top Rated</a>
+‎          <a href="#" class="hover:text-rose-400 transition-colors">Upcoming</a>
+‎        </div>
+‎      </div>
 ‎
-‎<div class="movies" id="movies"></div>
+‎      <!-- Search -->
+‎      <div class="flex-1 max-w-xl mx-8">
+‎        <div class="relative">
+‎          <input 
+‎            id="searchInput"
+‎            type="text" 
+‎            placeholder="Search movies, actors, genres..." 
+‎            class="w-full bg-white/10 border border-white/20 rounded-3xl py-3 pl-12 pr-6 text-sm focus:outline-none focus:border-rose-500 transition-all placeholder:text-gray-400">
+‎          <i class="fa-solid fa-magnifying-glass absolute left-5 top-3.5 text-gray-400"></i>
+‎        </div>
+‎      </div>
 ‎
-‎<script>
-‎const API_KEY = "2b670b583329b90bcbad43227626c5f9";
+‎      <div class="flex items-center gap-6">
+‎        <button class="text-gray-400 hover:text-white transition-colors">
+‎          <i class="fa-solid fa-bell text-xl"></i>
+‎        </button>
+‎        <div class="w-9 h-9 bg-gradient-to-br from-rose-500 to-purple-600 rounded-2xl flex items-center justify-center text-sm font-semibold">AN</div>
+‎      </div>
+‎    </div>
+‎  </nav>
 ‎
-‎const URL = "https://api.themoviedb.org/3/trending/movie/week?api_key=" + API_KEY;
+‎  <!-- HERO -->
+‎  <div class="hero flex items-end pb-16">
+‎    <div class="max-w-screen-2xl mx-auto px-8 w-full">
+‎      <div class="max-w-lg">
+‎        <div class="inline-flex items-center gap-2 bg-white/10 text-xs tracking-widest px-4 py-2 rounded-3xl mb-4">
+‎          <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+‎          TRENDING #1 THIS WEEK
+‎        </div>
+‎        <h2 id="heroTitle" class="text-6xl font-bold leading-none mb-4">Dune: Part Two</h2>
+‎        <p id="heroDesc" class="text-gray-300 mb-6 line-clamp-3">
+‎          Paul Atreides unites with Chani and the Fremen while seeking revenge against conspirators who destroyed his family.
+‎        </p>
+‎        
+‎        <div class="flex items-center gap-4">
+‎          <button onclick="watchTrailer()" 
+‎                  class="bg-white text-black font-semibold px-8 py-3.5 rounded-3xl flex items-center gap-3 hover:bg-gray-200 transition-all">
+‎            <i class="fa-solid fa-play"></i>
+‎            Watch Trailer
+‎          </button>
+‎          <button class="glass border border-white/30 font-medium px-6 py-3.5 rounded-3xl flex items-center gap-3 hover:bg-white/10 transition-all">
+‎            <i class="fa-solid fa-plus"></i>
+‎            Add to List
+‎          </button>
+‎        </div>
+‎      </div>
+‎    </div>
+‎  </div>
 ‎
-‎async function getMovies() {
-‎  try {
-‎    const res = await fetch(URL);
-‎    const data = await res.json();
+‎  <!-- MAIN CONTENT -->
+‎  <div class="max-w-screen-2xl mx-auto px-8 pt-10">
+‎    
+‎    <!-- TRENDING -->
+‎    <div class="mb-16">
+‎      <div class="flex items-end justify-between mb-8">
+‎        <h2 class="section-title text-3xl font-semibold">Trending This Week</h2>
+‎        <a href="#" class="text-rose-400 text-sm flex items-center gap-2 hover:underline">
+‎          View all <i class="fa-solid fa-arrow-right"></i>
+‎        </a>
+‎      </div>
+‎      
+‎      <div id="movies" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-6"></div>
+‎    </div>
 ‎
-‎    const moviesContainer = document.getElementById("movies");
+‎    <!-- MORE CATEGORIES (placeholders) -->
+‎    <div class="mb-16">
+‎      <h2 class="section-title text-3xl font-semibold mb-8">Top Rated</h2>
+‎      <div id="topRated" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-6"></div>
+‎    </div>
+‎  </div>
 ‎
-‎    if (!data.results) {
-‎      moviesContainer.innerHTML = "<p>Failed to load movies. Check API key.</p>";
-‎      return;
+‎  <!-- MOVIE MODAL -->
+‎  <div id="movieModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-lg z-[100] flex items-center justify-center p-6">
+‎    <div class="max-w-4xl w-full glass rounded-3xl overflow-hidden">
+‎      <div class="relative">
+‎        <button onclick="closeModal()" 
+‎                class="absolute top-6 right-6 w-10 h-10 bg-black/50 hover:bg-black/70 rounded-full flex items-center justify-center text-xl z-10 transition-colors">
+‎          ✕
+‎        </button>
+‎        <img id="modalBackdrop" class="w-full h-80 object-cover" alt="">
+‎        
+‎        <div class="p-8">
+‎          <h3 id="modalTitle" class="text-4xl font-bold mb-2"></h3>
+‎          <div class="flex items-center gap-6 text-sm mb-6">
+‎            <div id="modalRating" class="rating flex items-center gap-1"></div>
+‎            <div id="modalYear" class="text-gray-400"></div>
+‎            <div id="modalGenres" class="text-gray-400"></div>
+‎          </div>
+‎          
+‎          <p id="modalOverview" class="text-gray-300 leading-relaxed text-[15px]"></p>
+‎          
+‎          <div class="mt-10 flex gap-4">
+‎            <button onclick="watchTrailer()" 
+‎                    class="flex-1 bg-rose-600 hover:bg-rose-700 transition-colors py-4 rounded-2xl font-semibold flex items-center justify-center gap-3">
+‎              <i class="fa-solid fa-play"></i>
+‎              Watch Now
+‎            </button>
+‎            <button class="flex-1 border border-white/30 hover:bg-white/10 py-4 rounded-2xl font-semibold transition-colors">
+‎              Add to Watchlist
+‎            </button>
+‎          </div>
+‎        </div>
+‎      </div>
+‎    </div>
+‎  </div>
+‎
+‎  <script>
+‎    const API_KEY = "2b670b583329b90bcbad43227626c5f9"; // ← Replace with your TMDB key
+‎    
+‎    const TRENDING_URL = `https://api.themoviedb.org/3/trending/movie/week?api_key=${API_KEY}`;
+‎    const TOP_RATED_URL = `https://api.themoviedb.org/3/movie/top_rated?api_key=${API_KEY}`;
+‎
+‎    async function fetchMovies(url) {
+‎      try {
+‎        const res = await fetch(url);
+‎        if (!res.ok) throw new Error("API Error");
+‎        return await res.json();
+‎      } catch (err) {
+‎        console.error(err);
+‎        return { results: [] };
+‎      }
 ‎    }
 ‎
-‎    data.results.forEach(movie => {
+‎    function createMovieCard(movie) {
 ‎      const div = document.createElement("div");
-‎      div.classList.add("movie");
-‎
+‎      div.className = "movie-card bg-zinc-900 rounded-3xl overflow-hidden cursor-pointer";
+‎      
 ‎      div.innerHTML = `
-‎        <img src="https://image.tmdb.org/t/p/w500${movie.poster_path}">
-‎        <div class="info">
-‎          <h3>${movie.title}</h3>
-‎          <p>⭐ ${movie.vote_average}</p>
+‎        <div class="relative">
+‎          <img src="https://image.tmdb.org/t/p/w500${movie.poster_path}" 
+‎               class="w-full aspect-[2/3] object-cover" alt="${movie.title}">
+‎          <div class="rating absolute top-3 right-3 flex items-center gap-1">
+‎            <i class="fa-solid fa-star text-yellow-400 text-xs"></i>
+‎            <span>${movie.vote_average.toFixed(1)}</span>
+‎          </div>
+‎        </div>
+‎        <div class="p-5">
+‎          <h3 class="font-semibold line-clamp-2 leading-tight">${movie.title}</h3>
+‎          <p class="text-xs text-gray-400 mt-1">${movie.release_date ? movie.release_date.split('-')[0] : 'N/A'}</p>
 ‎        </div>
 ‎      `;
+‎      
+‎      div.onclick = () => showMovieModal(movie);
+‎      return div;
+‎    }
 ‎
+‎    async function loadTrending() {
+‎      const data = await fetchMovies(TRENDING_URL);
+‎      const container = document.getElementById("movies");
+‎      container.innerHTML = "";
+‎      
+‎      if (data.results.length === 0) {
+‎        container.innerHTML = `<p class="col-span-full text-center text-gray-400 py-12">Failed to load movies. Check your API key.</p>`;
+‎        return;
+‎      }
+‎      
+‎      data.results.slice(0, 14).forEach(movie => {
+‎        container.appendChild(createMovieCard(movie));
+‎      });
+‎    }
+‎
+‎    async function loadTopRated() {
+‎      const data = await fetchMovies(TOP_RATED_URL);
+‎      const container = document.getElementById("topRated");
+‎      container.innerHTML = "";
+‎      
+‎      data.results.slice(0, 14).forEach(movie => {
+‎        container.appendChild(createMovieCard(movie));
+‎      });
+‎    }
+‎
+‎    // Modal
+‎    let currentMovie = null;
+‎    
+‎    function showMovieModal(movie) {
+‎      currentMovie = movie;
+‎      document.getElementById("movieModal").classList.remove("hidden");
+‎      document.getElementById("modalBackdrop").src = `https://image.tmdb.org/t/p/original${movie.backdrop_path || movie.poster_path}`;
+‎      document.getElementById("modalTitle").textContent = movie.title;
+‎      document.getElementById("modalOverview").textContent = movie.overview;
+‎      document.getElementById("modalYear").textContent = movie.release_date ? movie.release_date.split('-')[0] : 'N/A';
+‎      
+‎      const ratingEl = document.getElementById("modalRating");
+‎      ratingEl.innerHTML = `
+‎        <i class="fa-solid fa-star text-yellow-400"></i>
+‎        <span>${movie.vote_average.toFixed(1)}</span>
+‎      `;
+‎    }
+‎    
+‎    function closeModal() {
+‎      document.getElementById("movieModal").classList.add("hidden");
+‎    }
+‎
+‎    function watchTrailer() {
+‎      if (!currentMovie) return;
+‎      const query = encodeURIComponent(currentMovie.title + " official trailer");
+‎      window.open(`https://www.youtube.com/results?search_query=${query}`, "_blank");
+‎    }
+‎
+‎    // Search
+‎    document.getElementById("searchInput").addEventListener("keypress", (e) => {
+‎      if (e.key === "Enter") {
+‎        const query = e.target.value.trim();
+‎        if (query) {
+‎          window.open(`https://www.themoviedb.org/search?query=${encodeURIComponent(query)}`, "_blank");
+‎        }
+‎      }
+‎    });
+‎
+‎    // Keyboard escape
+‎    document.addEventListener("keydown", (e) => {
+‎      if (e.key === "Escape") closeModal();
+‎    });
+‎
+‎    // Initialize
+‎    window.onload = () => {
+‎      loadTrending();
+‎      loadTopRated();
+‎    };
+‎  </script>
+‎</body>
+‎</html>
 ‎      moviesContainer.appendChild(div);
 ‎    });
 ‎
