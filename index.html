@@ -10,23 +10,32 @@
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
     body { font-family: 'Inter', sans-serif; background: #0a0a0a; color: #ffffff; }
-    .hero { background: linear-gradient(to bottom, rgba(0,0,0,0.7), rgba(10,10,10,0.95)), url('https://image.tmdb.org/t/p/original/8cdWjvZQUExUUTzyp4t1vYq1c2R.jpg') center/cover; min-height: 85vh; display: flex; align-items: flex-end; }
+    
+    .hero {
+      background: linear-gradient(to bottom, rgba(0,0,0,0.75), rgba(10,10,10,0.95)), 
+                  url('https://image.tmdb.org/t/p/original/8cdWjvZQUExUUTzyp4t1vYq1c2R.jpg') center/cover;
+      min-height: 68vh;
+      display: flex;
+      align-items: flex-end;
+    }
+
     .movie-card { transition: all 0.4s ease; }
-    .movie-card:hover { transform: scale(1.06); box-shadow: 0 20px 30px rgba(225, 29, 72, 0.3); }
+    .movie-card:hover { transform: scale(1.05); }
   </style>
 </head>
 <body class="min-h-screen">
 
   <!-- NAVBAR -->
   <nav class="fixed top-0 w-full bg-black/90 backdrop-blur-md z-50 border-b border-white/10">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
+    <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
       <div class="flex items-center gap-3">
         <div class="w-8 h-8 bg-rose-600 rounded-2xl flex items-center justify-center text-2xl font-bold">M</div>
-        <h1 class="text-2xl sm:text-3xl font-bold">MovieHub</h1>
+        <h1 class="text-2xl font-bold">MovieHub</h1>
       </div>
-      <div class="flex-1 max-w-md mx-4">
+      
+      <div class="flex-1 max-w-[220px] mx-3">
         <input id="searchInput" type="text" 
-               class="w-full bg-zinc-900 border border-zinc-700 rounded-full px-5 py-3 text-sm focus:outline-none focus:border-rose-500"
+               class="w-full bg-zinc-900 border border-zinc-700 rounded-full px-4 py-3 text-sm focus:outline-none focus:border-rose-500"
                placeholder="Search movies...">
       </div>
     </div>
@@ -34,45 +43,55 @@
 
   <!-- HERO -->
   <div class="hero">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 pb-12 w-full">
-      <p class="text-emerald-400 text-sm font-medium mb-2">TRENDING #1 THIS WEEK</p>
-      <h1 class="text-5xl sm:text-6xl font-bold mb-4">Dune: Part Two</h1>
-      <div class="flex gap-4">
-        <button onclick="watchTrailer()" class="bg-white text-black px-8 py-4 rounded-2xl font-semibold flex items-center gap-3">
-          <i class="fa-solid fa-play"></i> Watch Trailer
+    <div class="max-w-7xl mx-auto px-4 pb-10 w-full">
+      <p class="text-emerald-400 text-xs font-medium mb-2">TRENDING #1 THIS WEEK</p>
+      <h1 class="text-4xl sm:text-5xl font-bold mb-4 leading-tight">Dune: Part Two</h1>
+      <div class="flex gap-3">
+        <button onclick="watchTrailer()" 
+                class="bg-white text-black px-6 py-3.5 rounded-2xl font-semibold flex items-center gap-2 text-sm">
+          <i class="fa-solid fa-play"></i> Trailer
         </button>
       </div>
     </div>
   </div>
 
   <!-- MAIN CONTENT -->
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 py-10">
-    <h2 id="sectionTitle" class="text-3xl font-semibold mb-8">Trending This Week</h2>
-    <div id="moviesGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6"></div>
+  <div class="max-w-7xl mx-auto px-4 py-8">
+    <div class="flex justify-between items-center mb-6">
+      <h2 id="sectionTitle" class="text-2xl font-semibold">Trending This Week</h2>
+      <button onclick="refreshTrending()" class="text-rose-400 text-sm flex items-center gap-2">
+        <i class="fa-solid fa-rotate"></i> Refresh
+      </button>
+    </div>
+    <div id="moviesGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4"></div>
   </div>
 
   <!-- MODAL -->
   <div id="modal" class="hidden fixed inset-0 bg-black/95 flex items-center justify-center z-[100] p-4">
-    <div class="bg-zinc-900 w-full max-w-lg rounded-3xl overflow-hidden">
+    <div class="bg-zinc-900 w-full max-w-md rounded-3xl overflow-hidden">
       <div class="relative">
-        <button onclick="closeModal()" class="absolute top-4 right-4 bg-black/70 hover:bg-black w-10 h-10 rounded-full text-xl z-10">✕</button>
-        <img id="modalImage" class="w-full h-72 object-cover" alt="">
+        <button onclick="closeModal()" class="absolute top-4 right-4 bg-black/70 w-9 h-9 rounded-full text-xl">✕</button>
+        <img id="modalImage" class="w-full h-56 object-cover" alt="">
       </div>
-      <div class="p-6">
-        <h2 id="modalTitle" class="text-3xl font-bold"></h2>
-        <div id="modalInfo" class="text-gray-400 my-3"></div>
-        <p id="modalOverview" class="text-gray-300 leading-relaxed"></p>
-        
-        <div class="mt-8 grid grid-cols-2 gap-4">
-          <button onclick="watchTrailer()" 
-                  class="bg-rose-600 py-4 rounded-2xl font-medium flex items-center justify-center gap-2">
-            <i class="fa-solid fa-play"></i> Trailer
-          </button>
-          <button onclick="openLegalWatch()" 
-                  class="border border-white/40 py-4 rounded-2xl font-medium flex items-center justify-center gap-2">
-            🌐 Where to Watch
-          </button>
+      <div class="p-5">
+        <h2 id="modalTitle" class="text-2xl font-bold"></h2>
+        <div id="modalInfo" class="text-gray-400 my-2 text-sm"></div>
+        <p id="modalOverview" class="text-gray-300 text-sm leading-relaxed"></p>
+
+        <div class="mt-8">
+          <p class="text-gray-400 text-xs mb-4">WATCH ON</p>
+          <div class="grid grid-cols-2 gap-3">
+            <button onclick="openPlatform('Netflix')" class="bg-red-600 py-4 rounded-2xl text-sm font-medium">Netflix</button>
+            <button onclick="openPlatform('Prime Video')" class="bg-blue-600 py-4 rounded-2xl text-sm font-medium">Prime Video</button>
+            <button onclick="openPlatform('Disney+')" class="bg-sky-600 py-4 rounded-2xl text-sm font-medium">Disney+</button>
+            <button onclick="openPlatform('')" class="bg-zinc-700 py-4 rounded-2xl text-sm font-medium">More Options</button>
+          </div>
         </div>
+
+        <button onclick="watchTrailer()" 
+                class="mt-6 w-full bg-rose-600 py-4 rounded-2xl font-medium flex items-center justify-center gap-2">
+          <i class="fa-solid fa-play"></i> Watch Trailer
+        </button>
       </div>
     </div>
   </div>
@@ -86,10 +105,7 @@
         const res = await fetch(url);
         const data = await res.json();
         return data.results || [];
-      } catch (e) {
-        console.error(e);
-        return [];
-      }
+      } catch (e) { return []; }
     }
 
     function createCard(movie) {
@@ -97,9 +113,9 @@
       card.className = "movie-card bg-zinc-900 rounded-3xl overflow-hidden cursor-pointer";
       card.innerHTML = `
         <img src="https://image.tmdb.org/t/p/w500${movie.poster_path}" class="w-full aspect-[2/3] object-cover">
-        <div class="p-4">
-          <h3 class="font-semibold line-clamp-2">${movie.title}</h3>
-          <div class="text-xs text-gray-400 mt-2">${movie.release_date?.split('-')[0] || ''} • ★ ${movie.vote_average?.toFixed(1)}</div>
+        <div class="p-3">
+          <h3 class="font-semibold text-sm line-clamp-2">${movie.title}</h3>
+          <div class="text-xs text-gray-400 mt-1">${movie.release_date?.split('-')[0] || ''} • ★ ${movie.vote_average?.toFixed(1)}</div>
         </div>
       `;
       card.onclick = () => showModal(movie);
@@ -124,47 +140,43 @@
       window.open(`https://www.youtube.com/results?search_query=${encodeURIComponent(currentMovie.title + " official trailer")}`, "_blank");
     }
 
-    function openLegalWatch() {
+    function openPlatform(platform) {
       if (!currentMovie) return;
-      
       const title = encodeURIComponent(currentMovie.title);
       
-      // Multiple reliable fallbacks
-      const links = [
-        `https://www.justwatch.com/search?q=${title}`,
-        `https://reelgood.com/search?q=${title}`,
-        `https://www.google.com/search?q=where+to+watch+${title}+Nigeria`,
-        `https://www.google.com/search?q=${title}+streaming`
-      ];
-      
-      // Try JustWatch first, then others
-      window.open(links[0], "_blank");
+      if (platform === "Netflix") window.open(`https://www.netflix.com/search?q=${title}`, "_blank");
+      else if (platform === "Prime Video") window.open(`https://www.primevideo.com/search/ref=atv_nb_sr?phrase=${title}`, "_blank");
+      else if (platform === "Disney+") window.open(`https://www.disneyplus.com/search?q=${title}`, "_blank");
+      else window.open(`https://www.google.com/search?q=${title}+watch+online+Nigeria`, "_blank");
     }
 
     async function loadMovies(url, title) {
       document.getElementById("sectionTitle").textContent = title;
       const container = document.getElementById("moviesGrid");
-      container.innerHTML = `<p class="col-span-full text-center py-12 text-gray-400">Loading...</p>`;
+      container.innerHTML = `<p class="col-span-full text-center py-12 text-gray-400">Loading movies...</p>`;
 
       const movies = await fetchMovies(url);
       container.innerHTML = "";
-
-      movies.slice(0, 18).forEach(movie => {
+      
+      // Increased to 30 movies
+      movies.slice(0, 30).forEach(movie => {
         container.appendChild(createCard(movie));
       });
     }
 
-    // Search
+    function refreshTrending() {
+      loadMovies(`https://api.themoviedb.org/3/trending/movie/week?api_key=${API_KEY}`, "Trending This Week");
+    }
+
     document.getElementById("searchInput").addEventListener("keypress", (e) => {
       if (e.key === "Enter") {
         const query = e.target.value.trim();
-        if (query) {
-          loadMovies(`https://api.themoviedb.org/3/search/movie?api_key=\( {API_KEY}&query= \){encodeURIComponent(query)}`, `Results for "${query}"`);
-        }
+        if (query) loadMovies(`https://api.themoviedb.org/3/search/movie?api_key=\( {API_KEY}&query= \){encodeURIComponent(query)}`, `Results for "${query}"`);
       }
     });
 
-    // Initialize
+    setInterval(refreshTrending, 30 * 60 * 1000);
+
     window.onload = () => {
       loadMovies(`https://api.themoviedb.org/3/trending/movie/week?api_key=${API_KEY}`, "Trending This Week");
     };
