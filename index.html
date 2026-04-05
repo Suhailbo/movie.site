@@ -34,16 +34,6 @@ body { background:#000; color:white; }
  background:linear-gradient(to top, black, transparent);
 }
 
-.modal {
- position:fixed;
- inset:0;
- background:rgba(0,0,0,.9);
- display:none;
- justify-content:center;
- align-items:center;
- z-index:100;
-}
-
 .searchPage {
  position:fixed;
  inset:0;
@@ -63,34 +53,33 @@ body { background:#000; color:white; }
 
 <input id="searchInput"
 placeholder="Search movies..."
-class="bg-gray-800 px-3 py-1 rounded w-1/2">
+class="bg-gray-900 border border-gray-600 px-4 py-2 rounded w-1/2 text-white placeholder-gray-400 focus:outline-none focus:border-white">
 </nav>
 
 <!-- SEARCH PAGE -->
 <div id="searchPage" class="searchPage pt-20 px-4">
-
-<button onclick="closeSearch()" class="mb-4 bg-gray-700 px-4 py-2 rounded">
-← Back
-</button>
-
+<button onclick="closeSearch()" class="mb-4 bg-gray-700 px-4 py-2 rounded">← Back</button>
 <h2 class="text-2xl mb-4">Search Results</h2>
-
 <div id="searchResults" class="space-y-4"></div>
+</div>
 
+<!-- MOVIE PAGE -->
+<div id="moviePage" class="searchPage pt-20 px-4" style="display:none;">
+<button onclick="closeMoviePage()" class="mb-4 bg-gray-700 px-4 py-2 rounded">← Back</button>
+<div id="movieDetails"></div>
 </div>
 
 <!-- HOME -->
 <div id="homePage">
 
-<!-- HERO -->
 <div class="hero mt-16">
-<iframe id="heroVideo" src="" frameborder="0" allow="autoplay"></iframe>
+<iframe id="heroVideo" src="" allow="autoplay"></iframe>
 <div class="overlay"></div>
 
-<div class="absolute bottom-10 left-6 z-10">
+<div class="absolute bottom-10 left-6">
 <h1 id="heroTitle" class="text-4xl font-bold"></h1>
 <p id="heroDesc" class="max-w-lg text-gray-300"></p>
-<button onclick="openModal(heroMovie)" class="mt-3 bg-white text-black px-4 py-2">
+<button onclick="openMovie(heroMovie)" class="mt-3 bg-white text-black px-4 py-2">
 ▶ Watch Trailer
 </button>
 </div>
@@ -101,7 +90,6 @@ class="bg-gray-800 px-3 py-1 rounded w-1/2">
 <h2 class="text-xl mt-4 mb-2">🔥 Top 10</h2>
 <div id="top10" class="scroll mb-4"></div>
 
-<!-- AD -->
 <div class="text-center my-4">
 <ins class="adsbygoogle"
 style="display:block"
@@ -117,225 +105,154 @@ data-full-width-responsive="true"></ins>
 </div>
 </div>
 
-<!-- MODAL -->
-<div id="modal" class="modal flex items-center justify-center">
-<div class="bg-black p-5 max-w-lg w-full">
-
-<h2 id="mTitle" class="text-xl mb-2"></h2>
-
-<div class="flex gap-2 my-2 text-xs">
-<span class="bg-red-600 px-2 py-1 rounded">Netflix</span>
-<span class="bg-blue-600 px-2 py-1 rounded">Prime</span>
-<span class="bg-indigo-600 px-2 py-1 rounded">Disney+</span>
-</div>
-
-<div id="trailerBox" class="mb-3"></div>
-
-<p id="mDesc" class="text-gray-300"></p>
-
-<div class="flex gap-3 mt-3">
-<button onclick="playTrailer()" class="bg-white text-black px-3 py-1">▶ Trailer</button>
-<button onclick="closeModal()" class="bg-red-600 px-3 py-1">Close</button>
-</div>
-
-</div>
-</div>
-
-<!-- FOOTER + FEEDBACK -->
+<!-- FOOTER -->
 <footer class="bg-black text-gray-400 mt-10 px-6 py-10 border-t border-gray-800">
-
 <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
 
 <div>
 <h2 class="text-white font-bold mb-3">🎬 MovieHub</h2>
-<p>Discover movies, watch trailers and explore trending content worldwide.</p>
+<p>Explore trending movies worldwide.</p>
 </div>
 
 <div>
-<h3 class="text-white mb-3">Quick Links</h3>
+<h3 class="text-white mb-3">Links</h3>
 <ul class="space-y-2">
-<li onclick="goHome()" class="cursor-pointer hover:text-white">Home</li>
-<li>Top 10</li>
+<li onclick="goHome()">Home</li>
 <li>Categories</li>
 </ul>
 </div>
 
 <div>
-<h3 class="text-white mb-3">Send Feedback</h3>
+<h3 class="text-white mb-3">Feedback</h3>
 
-<form action="https://formsubmit.co/eh710214@gmail.com" method="POST" class="space-y-2">
-
-<input type="text" name="name" placeholder="Your Name"
-class="w-full px-3 py-2 bg-gray-800 rounded text-white" required>
-
-<input type="email" name="email" placeholder="Your Email"
-class="w-full px-3 py-2 bg-gray-800 rounded text-white" required>
-
-<textarea name="message" placeholder="Your feedback..."
-class="w-full px-3 py-2 bg-gray-800 rounded text-white" required></textarea>
-
-<button type="submit" class="bg-white text-black px-4 py-2 w-full">
-Send Feedback
-</button>
-
+<form action="https://formsubmit.co/eh710214@gmail.com" method="POST">
+<input type="text" name="name" placeholder="Name" class="w-full mb-2 bg-gray-800 p-2">
+<input type="email" name="email" placeholder="Email" class="w-full mb-2 bg-gray-800 p-2">
+<textarea name="message" placeholder="Feedback" class="w-full mb-2 bg-gray-800 p-2"></textarea>
+<button class="bg-white text-black px-4 py-2 w-full">Send</button>
 <input type="hidden" name="_captcha" value="false">
-<input type="hidden" name="_template" value="table">
-
 </form>
 
 </div>
 
 </div>
 
-<div class="border-t border-gray-800 mt-6 pt-4 text-center text-sm">
-<p>© 2026 MovieHub</p>
-<p>Email: eh710214@gmail.com | Phone: +2349049696168</p>
+<div class="text-center mt-6">
+<p>© 2026 MovieHub | +2349049696168</p>
 </div>
-
 </footer>
 
 <script>
 
 const API_KEY="2b670b583329b90bcbad43227626c5f9";
 
-let currentMovie=null;
-let currentTrailer=null;
-let heroMovie=null;
+// SEARCH
+searchInput.onfocus=()=> searchPage.style.display="block";
 
-function goHome(){
- searchPage.style.display="none";
-}
+searchInput.oninput=async()=>{
+ const q=searchInput.value;
+ if(q.length<2){ searchResults.innerHTML=""; return; }
+
+ const res=await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${q}`);
+ const data=await res.json();
+
+ searchResults.innerHTML=data.results.map(m=>`
+ <div class="flex gap-4 bg-gray-900 p-3 rounded cursor-pointer">
+ <img src="https://image.tmdb.org/t/p/w200${m.poster_path}" class="w-24">
+ <div>
+ <h3>${m.title}</h3>
+ <p class="text-sm text-gray-400">${m.overview||""}</p>
+ </div>
+ </div>`).join("");
+
+ document.querySelectorAll("#searchResults > div").forEach((el,i)=>{
+  el.onclick=()=>openMovie(data.results[i]);
+ });
+};
 
 function closeSearch(){
  searchPage.style.display="none";
- searchInput.value="";
- searchResults.innerHTML="";
 }
-
-// OPEN SEARCH
-searchInput.addEventListener("focus", ()=>{
- searchPage.style.display="block";
-});
-
-// SEARCH
-searchInput.addEventListener("input", async ()=>{
- const q = searchInput.value;
-
- if(q.length < 2){
-  searchResults.innerHTML="";
-  return;
- }
-
- const res = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${q}`);
- const data = await res.json();
-
- searchResults.innerHTML = data.results.map(m => `
-  <div class="flex gap-4 bg-gray-900 p-3 rounded cursor-pointer hover:bg-gray-800">
-    <img src="https://image.tmdb.org/t/p/w200${m.poster_path}" class="w-24 rounded">
-    <div>
-      <h3 class="text-lg font-bold">${m.title}</h3>
-      <p class="text-sm text-gray-400">${m.overview || "No description available"}</p>
-    </div>
-  </div>
- `).join("");
-
- document.querySelectorAll("#searchResults > div").forEach((el,i)=>{
-  el.onclick=()=>openModal(data.results[i]);
- });
-});
 
 // TRAILER
 async function getTrailer(id){
  const res=await fetch(`https://api.themoviedb.org/3/movie/${id}/videos?api_key=${API_KEY}`);
  const data=await res.json();
- const t=data.results.find(v=>v.type==="Trailer");
- return t ? t.key : null;
+ return data.results.find(v=>v.type==="Trailer")?.key;
 }
 
-// HERO
-async function setHero(movie){
- heroMovie=movie;
- heroTitle.innerText=movie.title;
- heroDesc.innerText=movie.overview;
-
- const t=await getTrailer(movie.id);
- if(t){
-  heroVideo.src=`https://www.youtube.com/embed/${t}?autoplay=1&mute=1`;
- }
+// STREAMING DETECTION
+async function getProviders(id){
+ const res=await fetch(`https://api.themoviedb.org/3/movie/${id}/watch/providers?api_key=${API_KEY}`);
+ const data=await res.json();
+ return data.results?.NG?.flatrate || [];
 }
 
-// MODAL
-async function openModal(m){
- currentMovie=m;
- mTitle.innerText=m.title;
- mDesc.innerText=m.overview;
+// OPEN MOVIE PAGE
+async function openMovie(m){
 
- currentTrailer=await getTrailer(m.id);
- trailerBox.innerHTML="";
- modal.style.display="flex";
-}
+ searchPage.style.display="none";
+ moviePage.style.display="block";
 
-function playTrailer(){
- if(!currentTrailer) return alert("No trailer");
+ const trailer=await getTrailer(m.id);
+ const providers=await getProviders(m.id);
 
- trailerBox.innerHTML=`
- <iframe width="100%" height="200"
- src="https://www.youtube.com/embed/${currentTrailer}?autoplay=1"></iframe>`;
-}
+ const providerHTML=providers.map(p=>`
+ <span class="bg-gray-700 px-3 py-1 rounded">${p.provider_name}</span>
+ `).join("") || "Not available";
 
-function closeModal(){
- modal.style.display="none";
- trailerBox.innerHTML="";
-}
+ movieDetails.innerHTML=`
+ <div class="flex flex-col md:flex-row gap-6">
 
-// CARD
-function card(m){
- return `<div class="card">
- <img src="https://image.tmdb.org/t/p/w300${m.poster_path}">
+ <img src="https://image.tmdb.org/t/p/w400${m.poster_path}" class="rounded w-full md:w-1/3">
+
+ <div>
+ <h1 class="text-3xl font-bold">${m.title}</h1>
+ <p class="text-yellow-400">⭐ ${m.vote_average}</p>
+ <p class="text-gray-300 my-3">${m.overview||""}</p>
+
+ <div class="flex gap-2 flex-wrap mb-3">
+ ${providerHTML}
+ </div>
+
+ <button onclick="playTrailer('${trailer}')" class="bg-white text-black px-4 py-2">
+ ▶ Watch Trailer
+ </button>
+
+ <div id="trailerBox" class="mt-4"></div>
+
+ </div>
  </div>`;
 }
 
-// LOAD
+function playTrailer(key){
+ if(!key) return alert("No trailer");
+
+ trailerBox.innerHTML=`
+ <iframe width="100%" height="300"
+ src="https://www.youtube.com/embed/${key}?autoplay=1"></iframe>`;
+}
+
+function closeMoviePage(){
+ moviePage.style.display="none";
+}
+
+// HERO + LOAD
 async function load(){
 
  const trending=await fetch(`https://api.themoviedb.org/3/trending/movie/week?api_key=${API_KEY}`).then(r=>r.json());
 
- setHero(trending.results[0]);
+ const hero=trending.results[0];
+ heroTitle.innerText=hero.title;
+ heroDesc.innerText=hero.overview;
 
- top10.innerHTML=trending.results.slice(0,10).map(card).join("");
+ const t=await getTrailer(hero.id);
+ if(t) heroVideo.src=`https://www.youtube.com/embed/${t}?autoplay=1&mute=1`;
 
- document.querySelectorAll("#top10 .card").forEach((c,i)=>{
-  c.onclick=()=>openModal(trending.results[i]);
- });
-
- const genres=[
- ["Action",28],
- ["Comedy",35],
- ["Horror",27],
- ["Sci-Fi",878],
- ["Romance",10749],
- ["Drama",18],
- ["Animation",16],
- ["Thriller",53],
- ["Crime",80],
- ["Adventure",12]
- ];
-
- for(const [name,id] of genres){
-
-  const res=await fetch(`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=${id}`);
-  const data=await res.json();
-
-  rows.innerHTML+=`
-  <h2 class="mt-4">${name}</h2>
-  <div class="scroll mb-4">
-  ${data.results.map(card).join("")}
-  </div>`;
-
-  const cards=rows.lastElementChild.querySelectorAll(".card");
-  cards.forEach((c,i)=>c.onclick=()=>openModal(data.results[i]));
- }
-
+ top10.innerHTML=trending.results.slice(0,10).map(m=>`
+ <div class="card" onclick='openMovie(${JSON.stringify(m)})'>
+ <img src="https://image.tmdb.org/t/p/w300${m.poster_path}">
+ </div>`).join("");
 }
 
 window.onload=load;
