@@ -20,14 +20,7 @@ body { background:#000; color:white; }
 .card { min-width:140px; cursor:pointer; transition:.3s; }
 .card:hover { transform:scale(1.08); }
 
-.hero { height:65vh; position:relative; }
-.hero iframe { position:absolute; width:100%; height:100%; }
-
-.overlay {
- position:absolute;
- inset:0;
- background:linear-gradient(to top, black, transparent);
-}
+.hero iframe { width:100%; height:250px; }
 
 .page {
  position:fixed;
@@ -50,6 +43,11 @@ body { background:#000; color:white; }
 class="bg-gray-900 border border-gray-600 px-4 py-2 rounded w-1/2 text-white">
 </nav>
 
+<!-- TOP BANNER (NEW FIX) -->
+<div class="text-center py-3 bg-gradient-to-r from-purple-600 to-pink-600 font-bold">
+🔥 Unlimited Movies • Trailers • Recommendations
+</div>
+
 <!-- SEARCH -->
 <div id="searchPage" class="page pt-20 px-4">
 <button onclick="closeSearch()">← Back</button>
@@ -66,29 +64,23 @@ class="bg-gray-900 border border-gray-600 px-4 py-2 rounded w-1/2 text-white">
 <div id="recommendations" class="scroll mt-3"></div>
 </div>
 
-<!-- LEGAL PAGES -->
+<!-- LEGAL -->
 <div id="privacyPage" class="page">
 <button onclick="goHome()">← Back</button>
 <h1 class="text-3xl font-bold mt-4">Privacy Policy</h1>
-<p class="mt-4 text-gray-300">
-We collect basic data like cookies and usage to improve experience. We do not sell your data.
-</p>
+<p class="mt-4 text-gray-300">We collect basic data to improve experience.</p>
 </div>
 
 <div id="termsPage" class="page">
 <button onclick="goHome()">← Back</button>
-<h1 class="text-3xl font-bold mt-4">Terms of Service</h1>
-<p class="mt-4 text-gray-300">
-By using MovieHub, you agree to use it responsibly. We do not host movies.
-</p>
+<h1 class="text-3xl font-bold mt-4">Terms</h1>
+<p class="mt-4 text-gray-300">Use responsibly. We don’t host movies.</p>
 </div>
 
 <div id="disclaimerPage" class="page">
 <button onclick="goHome()">← Back</button>
 <h1 class="text-3xl font-bold mt-4">Disclaimer</h1>
-<p class="mt-4 text-gray-300">
-All content belongs to respective owners. We only provide trailers and links.
-</p>
+<p class="mt-4 text-gray-300">All content belongs to owners.</p>
 </div>
 
 <!-- HOME -->
@@ -96,24 +88,23 @@ All content belongs to respective owners. We only provide trailers and links.
 
 <div class="hero">
 <iframe id="heroVideo" allow="autoplay"></iframe>
-<div class="overlay"></div>
+</div>
 
-<div class="absolute bottom-6 left-6 right-6 max-w-xl">
-<h1 id="heroTitle" class="text-3xl md:text-5xl font-bold"></h1>
+<!-- TEXT NOW BELOW VIDEO (FIXED) -->
+<div class="px-4 mt-4">
+<h1 id="heroTitle" class="text-3xl font-bold"></h1>
 <p id="heroDesc" class="text-gray-300 mt-2"></p>
 
-<div class="flex gap-3 mt-4">
-<button onclick="openMovie(heroMovie)" class="bg-white text-black px-4 py-2 rounded">
+<button onclick="openMovie(heroMovie)"
+class="mt-3 bg-white text-black px-4 py-2 rounded">
 ▶ Watch Trailer
 </button>
 </div>
-</div>
-</div>
 
-<div class="px-4">
+<div class="px-4 mt-4">
 
 <!-- ADS -->
-<div class="my-6 text-center max-w-4xl mx-auto">
+<div class="my-4 text-center max-w-4xl mx-auto">
 <ins class="adsbygoogle"
 style="display:block"
 data-ad-client="ca-pub-2257272049115568"
@@ -123,7 +114,7 @@ data-full-width-responsive="true"></ins>
 <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
 </div>
 
-<h2 class="text-xl mt-4 mb-2">🔥 Top 10</h2>
+<h2 class="text-xl mb-2">🔥 Top 10</h2>
 <div id="top10" class="scroll mb-4"></div>
 
 <div id="rows"></div>
@@ -145,7 +136,7 @@ data-full-width-responsive="true"></ins>
 <h3 class="text-white mb-3">Quick Links</h3>
 <ul class="space-y-2 text-gray-400">
 <li onclick="goHome()" class="cursor-pointer hover:text-white">Home</li>
-<li onclick="openPage('privacyPage')" class="cursor-pointer hover:text-white">Privacy Policy</li>
+<li onclick="openPage('privacyPage')" class="cursor-pointer hover:text-white">Privacy</li>
 <li onclick="openPage('termsPage')" class="cursor-pointer hover:text-white">Terms</li>
 <li onclick="openPage('disclaimerPage')" class="cursor-pointer hover:text-white">Disclaimer</li>
 </ul>
@@ -190,6 +181,12 @@ function openPage(id){
  homePage.style.display="none";
 }
 
+// BACK FIX (IMPORTANT)
+function closeMoviePage(){
+ moviePage.style.display="none";
+ homePage.style.display="block";
+}
+
 // SEARCH
 searchInput.onclick=()=> searchPage.style.display="block";
 
@@ -214,7 +211,7 @@ async function runSearch(q){
 
  searchResults.innerHTML=data.results.map(m=>`
  <div class="flex gap-4 bg-gray-900 p-3 rounded cursor-pointer">
- <img src="${m.poster_path ? `https://image.tmdb.org/t/p/w200${m.poster_path}` : 'https://via.placeholder.com/200x300'}" class="w-24">
+ <img src="${m.poster_path ? `https://image.tmdb.org/t/p/w200${m.poster_path}` : ''}" class="w-24">
  <div><h3>${m.title}</h3></div>
  </div>`).join("");
 
@@ -223,38 +220,11 @@ async function runSearch(q){
  });
 }
 
-// PROVIDERS
-async function getProviders(id){
- const r=await fetch(`https://api.themoviedb.org/3/movie/${id}/watch/providers?api_key=${API_KEY}`);
- const d=await r.json();
- return d.results?.NG || d.results?.US || {};
-}
-
-// RECOMMENDATIONS
-async function getRecommendations(id){
- const r=await fetch(`https://api.themoviedb.org/3/movie/${id}/recommendations?api_key=${API_KEY}`);
- const d=await r.json();
- return d.results.slice(0,10);
-}
-
-// TRAILER
-function playTrailer(key){
- if(!key) return alert("No trailer");
-
- document.getElementById("trailerBox").innerHTML = `
- <iframe width="100%" height="250"
- src="https://www.youtube.com/embed/${key}?autoplay=1"></iframe>`;
-}
-
 // MOVIE
 async function openMovie(m){
 
  moviePage.style.display="block";
  homePage.style.display="none";
-
- const providerData = await getProviders(m.id);
- const providers = providerData.flatrate || [];
- const link = providerData.link;
 
  const vid=await fetch(`https://api.themoviedb.org/3/movie/${m.id}/videos?api_key=${API_KEY}`).then(r=>r.json());
  const trailer=vid.results.find(v=>v.type==="Trailer");
@@ -262,41 +232,20 @@ async function openMovie(m){
  const watchLink=`https://www.justwatch.com/ng/search?q=${encodeURIComponent(m.title)}`;
 
  movieDetails.innerHTML=`
- <img src="${m.poster_path ? `https://image.tmdb.org/t/p/w400${m.poster_path}` : ''}" class="mb-4 rounded">
+ <img src="https://image.tmdb.org/t/p/w400${m.poster_path}" class="mb-4 rounded">
 
  <h1 class="text-3xl font-bold">${m.title}</h1>
  <p class="text-yellow-400">⭐ ${m.vote_average}</p>
  <p class="text-gray-300 my-3">${m.overview||""}</p>
 
- <div class="flex flex-wrap gap-3">
+ <button onclick="playTrailer('${trailer?.key}')"
+ class="bg-white text-black px-4 py-2 rounded">▶ Trailer</button>
 
- <button onclick="playTrailer('${trailer?.key}')" class="bg-white text-black px-4 py-2 rounded">
- ▶ Trailer
- </button>
-
- <a href="${watchLink}" target="_blank" class="bg-green-600 px-4 py-2 rounded">
- 📥 Watch / Download
- </a>
-
- ${providers.length ? providers.map(p=>`
- <a href="${link}" target="_blank" class="flex items-center gap-2 px-4 py-2 bg-gray-900 rounded">
- <img src="https://image.tmdb.org/t/p/w45${p.logo_path}" class="w-6">
- ${p.provider_name}
- </a>`).join("") : `
- <button class="bg-gray-700 opacity-50 px-4 py-2 rounded">Not Available</button>`}
-
- </div>
+ <a href="${watchLink}" target="_blank"
+ class="bg-green-600 px-4 py-2 rounded ml-2">📥 Watch</a>
 
  <div id="trailerBox" class="mt-4"></div>
  `;
-
- const recs = await getRecommendations(m.id);
-
- recommendations.innerHTML = recs.map(r=>`
- <div class="card" onclick='openMovie(${JSON.stringify(r)})'>
- <img src="https://image.tmdb.org/t/p/w300${r.poster_path}">
- </div>
- `).join("");
 }
 
 // LOAD
@@ -318,29 +267,6 @@ async function load(){
  <div class="card" onclick='openMovie(${JSON.stringify(m)})'>
  <img src="https://image.tmdb.org/t/p/w300${m.poster_path}">
  </div>`).join("");
-
- const genres=[
- ["Action",28],["Comedy",35],["Horror",27],
- ["Sci-Fi",878],["Romance",10749],
- ["Drama",18],["Animation",16],
- ["Thriller",53],["Crime",80],["Adventure",12]
- ];
-
- rows.innerHTML="";
-
- for(const [name,id] of genres){
-  const res=await fetch(`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=${id}`);
-  const data=await res.json();
-
-  rows.innerHTML+=`
-  <h2 class="mt-4 font-bold">${name}</h2>
-  <div class="scroll mb-4">
-  ${data.results.map(m=>`
-   <div class="card" onclick='openMovie(${JSON.stringify(m)})'>
-   <img src="https://image.tmdb.org/t/p/w300${m.poster_path}">
-   </div>`).join("")}
-  </div>`;
- }
 }
 
 window.onload=load;
