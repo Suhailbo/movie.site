@@ -78,7 +78,8 @@ body { background:#000; color:white; }
 style="display:block"
 data-ad-client="ca-pub-2257272049115568"
 data-ad-slot="1411335960"
-data-ad-format="auto"></ins>
+data-ad-format="auto"
+data-full-width-responsive="true"></ins>
 <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
 </div>
 
@@ -87,18 +88,6 @@ data-ad-format="auto"></ins>
 
 <h2 class="mb-2">🔥 Top 10</h2>
 <div id="top10" class="scroll mb-6"></div>
-
-<h2>🏆 Top 5 Movies</h2>
-<div id="top5" class="scroll mb-6"></div>
-
-<h2>📺 Streaming Platforms</h2>
-<div id="providers" class="flex gap-3 mb-6"></div>
-
-<h2>🔥 On Netflix</h2>
-<div id="netflixRow" class="scroll mb-6"></div>
-
-<h2>⏳ Coming Soon</h2>
-<div id="upcoming" class="scroll mb-6"></div>
 
 <div id="rows"></div>
 
@@ -133,7 +122,6 @@ const API_KEY="fc53416dd4f13229c0a99225cf54033c";
 
 let heroMovie;
 
-// FIX: stop trailer sound
 function stopAllVideos(){
 document.querySelectorAll("iframe").forEach(v=>v.src=v.src);
 }
@@ -184,6 +172,7 @@ searchResults.innerHTML=data.results.map(m=>`
 
 // CARD
 function card(m){
+if(!m.poster_path) return "";
 return `<div class="card" onclick='openMovie(${JSON.stringify(m)})'>
 <img src="https://image.tmdb.org/t/p/w300${m.poster_path}">
 </div>`;
@@ -207,12 +196,13 @@ movieDetails.innerHTML=`
 <p class="text-yellow-400">⭐ ${m.vote_average}</p>
 <p class="my-3">${m.overview||""}</p>
 
-<div class="flex gap-2 flex-wrap">
-${providers.map(p=>`
+<h3 class="mt-3 font-bold">📺 Watch On</h3>
+<div class="flex gap-2 flex-wrap mt-2">
+${providers.length ? providers.map(p=>`
 <div class="bg-gray-800 px-3 py-2 rounded flex items-center gap-2">
 <img src="https://image.tmdb.org/t/p/w45${p.logo_path}" class="w-5">
 ${p.provider_name}
-</div>`).join("")}
+</div>`).join("") : "<p class='text-gray-400'>Not available</p>"}
 </div>
 
 <button onclick="playTrailer('${trailer?.key}')" class="bg-white text-black px-4 py-2 mt-3 rounded">▶ Trailer</button>
@@ -249,13 +239,25 @@ if(tr)heroVideo.src=`https://www.youtube.com/embed/${tr.key}?autoplay=1&mute=1`;
 
 top10.innerHTML=t.results.slice(0,10).map(card).join("");
 
-// categories
-const genres=[["Action",28],["Comedy",35],["Horror",27]];
+// FULL CATEGORIES
+const genres = [
+["Action",28],["Adventure",12],["Animation",16],["Comedy",35],
+["Crime",80],["Documentary",99],["Drama",18],["Family",10751],
+["Fantasy",14],["History",36],["Horror",27],["Music",10402],
+["Mystery",9648],["Romance",10749],["Sci-Fi",878],["TV Movie",10770],
+["Thriller",53],["War",10752],["Western",37]
+];
+
 rows.innerHTML="";
 for(const [n,id] of genres){
 const r=await fetch(`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=${id}`);
 const d=await r.json();
-rows.innerHTML+=`<h2 class="mt-4">${n}</h2><div class="scroll mb-6">${d.results.map(card).join("")}</div>`;
+
+rows.innerHTML+=`
+<h2 class="mt-6 font-bold">${n}</h2>
+<div class="scroll mb-6">
+${d.results.map(card).join("")}
+</div>`;
 }
 }
 
