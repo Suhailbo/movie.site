@@ -7,9 +7,9 @@
 
 <script src="https://cdn.tailwindcss.com"></script>
 
-<!-- ✅ ADSENSE -->
+<!-- ✅ ADSENSE SCRIPT -->
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2257272049115568"
-crossorigin="anonymous"></script>
+     crossorigin="anonymous"></script>
 
 <style>
 body { background:#000; color:white; }
@@ -29,14 +29,13 @@ body { background:#000; color:white; }
  background:linear-gradient(to top, black, transparent);
 }
 
-.page {
+.searchPage {
  position:fixed;
  inset:0;
  background:black;
  z-index:200;
  display:none;
  overflow-y:auto;
- padding:20px;
 }
 </style>
 </head>
@@ -47,49 +46,30 @@ body { background:#000; color:white; }
 <nav class="sticky top-0 backdrop-blur bg-black/70 flex justify-between p-4 z-50">
 <h1 onclick="goHome()" class="font-bold cursor-pointer">🎬 MovieHub</h1>
 
-<input id="searchInput" placeholder="Search movies..."
+<input id="searchInput"
+placeholder="Search movies..."
 class="bg-gray-900 border border-gray-600 px-4 py-2 rounded w-1/2 text-white">
 </nav>
 
 <!-- SEARCH -->
-<div id="searchPage" class="page">
-<button onclick="closeSearch()">← Back</button>
-<input id="searchInput2" class="w-full mt-3 bg-gray-900 p-3 rounded">
-<div id="searchResults" class="mt-4"></div>
+<div id="searchPage" class="searchPage pt-20 px-4">
+<button onclick="closeSearch()" class="mb-4 bg-gray-700 px-4 py-2 rounded">← Back</button>
+
+<input id="searchInput2"
+placeholder="Search movies..."
+class="w-full bg-gray-900 border border-gray-600 px-4 py-3 rounded text-white mb-4">
+
+<div id="searchResults"></div>
 </div>
 
 <!-- MOVIE -->
-<div id="moviePage" class="page">
-<button onclick="closeMoviePage()">← Back</button>
+<div id="moviePage" class="searchPage pt-20 px-4">
+<button onclick="closeMoviePage()" class="mb-4 bg-gray-700 px-4 py-2 rounded">← Back</button>
+
 <div id="movieDetails"></div>
-<h2 class="mt-6">Recommended</h2>
-<div id="recommendations" class="scroll"></div>
-</div>
 
-<!-- LEGAL PAGES -->
-<div id="privacyPage" class="page">
-<button onclick="goHome()">← Back</button>
-<h1 class="text-2xl font-bold mt-4">Privacy Policy</h1>
-<p class="mt-3 text-gray-300">
-We respect your privacy. MovieHub does not collect personal data except what you provide in feedback forms. 
-Third-party services like Google AdSense may use cookies to show relevant ads.
-</p>
-</div>
-
-<div id="termsPage" class="page">
-<button onclick="goHome()">← Back</button>
-<h1 class="text-2xl font-bold mt-4">Terms of Service</h1>
-<p class="mt-3 text-gray-300">
-By using MovieHub, you agree not to misuse the platform. All movie data is provided by third-party APIs.
-</p>
-</div>
-
-<div id="disclaimerPage" class="page">
-<button onclick="goHome()">← Back</button>
-<h1 class="text-2xl font-bold mt-4">Disclaimer</h1>
-<p class="mt-3 text-gray-300">
-MovieHub does not host or stream movies. We only display trailers and metadata from public APIs.
-</p>
+<h2 class="mt-6 text-xl">🤖 Recommended</h2>
+<div id="recommendations" class="scroll mt-3"></div>
 </div>
 
 <!-- HOME -->
@@ -101,30 +81,28 @@ MovieHub does not host or stream movies. We only display trailers and metadata f
 
 <div class="absolute bottom-10 left-6">
 <h1 id="heroTitle" class="text-4xl font-bold"></h1>
-<p id="heroDesc" class="text-gray-300"></p>
-<button onclick="openMovie(heroMovie)" class="bg-white text-black px-4 py-2 mt-3">
-▶ Watch Trailer
-</button>
+<p id="heroDesc" class="max-w-lg text-gray-300"></p>
+<button onclick="openMovie(heroMovie)" class="mt-3 bg-white text-black px-4 py-2">▶ Watch Trailer</button>
 </div>
 </div>
 
 <div class="px-4">
 
-<!-- ADS -->
-<div class="my-6 text-center">
+<!-- ✅ ADSENSE (TOP) -->
+<div class="my-6 text-center max-w-4xl mx-auto">
 <ins class="adsbygoogle"
-style="display:block"
-data-ad-client="ca-pub-2257272049115568"
-data-ad-slot="1411335960"
-data-ad-format="auto"
-data-full-width-responsive="true"></ins>
+     style="display:block"
+     data-ad-client="ca-pub-2257272049115568"
+     data-ad-slot="1411335960"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
 <script>
 (adsbygoogle = window.adsbygoogle || []).push({});
 </script>
 </div>
 
-<h2 class="text-xl mt-4">🔥 Top 10</h2>
-<div id="top10" class="scroll"></div>
+<h2 class="text-xl mt-4 mb-2">🔥 Top 10</h2>
+<div id="top10" class="scroll mb-4"></div>
 
 <div id="rows"></div>
 
@@ -137,76 +115,133 @@ data-full-width-responsive="true"></ins>
 <div class="grid md:grid-cols-3 gap-8">
 
 <div>
-<h2 class="font-bold">🎬 MovieHub</h2>
-<p class="text-gray-400">Discover movies & trailers.</p>
+<h2 class="text-white font-bold text-lg mb-3">🎬 MovieHub</h2>
+<p class="text-gray-400">Discover movies, trailers & streaming platforms.</p>
 </div>
 
 <div>
-<h3>Links</h3>
-<ul class="text-gray-400 space-y-2">
+<h3 class="text-white mb-3">Links</h3>
+<ul class="space-y-2 text-gray-400">
 <li onclick="goHome()">Home</li>
-<li onclick="openPage('privacyPage')">Privacy Policy</li>
-<li onclick="openPage('termsPage')">Terms of Service</li>
-<li onclick="openPage('disclaimerPage')">Disclaimer</li>
 </ul>
 </div>
 
 <div>
-<h3>Feedback</h3>
+<h3 class="text-white mb-3">Feedback</h3>
+
 <form action="https://formsubmit.co/eh710214@gmail.com" method="POST">
-<input name="name" placeholder="Name" class="w-full mb-2 bg-gray-800 p-2">
-<input name="email" placeholder="Email" class="w-full mb-2 bg-gray-800 p-2">
-<textarea name="message" placeholder="Feedback" class="w-full mb-2 bg-gray-800 p-2"></textarea>
-<button class="bg-white text-black w-full p-2">Send</button>
+<input type="text" name="name" placeholder="Name" class="w-full mb-2 bg-gray-800 p-2 rounded">
+<input type="email" name="email" placeholder="Email" class="w-full mb-2 bg-gray-800 p-2 rounded">
+<textarea name="message" placeholder="Feedback" class="w-full mb-2 bg-gray-800 p-2 rounded"></textarea>
+<button class="bg-white text-black px-4 py-2 w-full rounded">Send</button>
+<input type="hidden" name="_captcha" value="false">
 </form>
-</div>
 
 </div>
 
-<div class="text-center text-gray-500 mt-6">
+</div>
+
+<div class="text-center text-gray-500 mt-6 text-sm">
 © 2026 MovieHub
 </div>
 
 </footer>
 
 <script>
+
 const API_KEY="2b670b583329b90bcbad43227626c5f9";
 let heroMovie;
 
 function goHome(){
- document.querySelectorAll(".page").forEach(p=>p.style.display="none");
  homePage.style.display="block";
+ moviePage.style.display="none";
+ searchPage.style.display="none";
 }
 
-function openPage(id){
- goHome();
- document.getElementById(id).style.display="block";
- homePage.style.display="none";
-}
+searchInput.onclick=()=>{
+ searchPage.style.display="block";
+ setTimeout(()=>searchInput2.focus(),100);
+};
 
-searchInput.onclick=()=> searchPage.style.display="block";
+searchInput.oninput=()=>{
+ searchInput2.value=searchInput.value;
+ runSearch(searchInput.value);
+};
 
-function closeSearch(){ searchPage.style.display="none"; }
+searchInput2.oninput=()=>{
+ searchInput.value=searchInput2.value;
+ runSearch(searchInput2.value);
+};
 
 async function runSearch(q){
- if(q.length<2) return;
+ if(q.length<2){ searchResults.innerHTML=""; return; }
+
  const res=await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${q}`);
  const data=await res.json();
 
  searchResults.innerHTML=data.results.map(m=>`
- <div onclick='openMovie(${JSON.stringify(m)})' class="p-3 bg-gray-800 mb-2">
- ${m.title}
+ <div class="flex gap-4 bg-gray-900 p-3 rounded cursor-pointer">
+ <img src="${m.poster_path ? `https://image.tmdb.org/t/p/w200${m.poster_path}` : 'https://via.placeholder.com/200x300'}" class="w-24">
+ <div>
+ <h3>${m.title}</h3>
+ <p class="text-sm text-gray-400">${m.overview||""}</p>
+ </div>
  </div>`).join("");
+
+ document.querySelectorAll("#searchResults > div").forEach((el,i)=>{
+  el.onclick=()=>openMovie(data.results[i]);
+ });
 }
 
-searchInput.oninput=e=>runSearch(e.target.value);
-searchInput2.oninput=e=>runSearch(e.target.value);
+function closeSearch(){ searchPage.style.display="none"; }
+
+async function getTrailer(id){
+ const r=await fetch(`https://api.themoviedb.org/3/movie/${id}/videos?api_key=${API_KEY}`);
+ const d=await r.json();
+ return d.results.find(v=>v.type==="Trailer")?.key;
+}
+
+async function getRecommendations(id){
+ const r=await fetch(`https://api.themoviedb.org/3/movie/${id}/recommendations?api_key=${API_KEY}`);
+ const d=await r.json();
+ return d.results.slice(0,10);
+}
 
 async function openMovie(m){
+
  moviePage.style.display="block";
  homePage.style.display="none";
 
- movieDetails.innerHTML=`<h1 class="text-2xl">${m.title}</h1>`;
+ const trailer=await getTrailer(m.id);
+ const recs=await getRecommendations(m.id);
+
+ movieDetails.innerHTML=`
+ <div class="flex flex-col md:flex-row gap-6">
+ <img src="${m.poster_path ? `https://image.tmdb.org/t/p/w400${m.poster_path}` : ''}" class="rounded w-full md:w-1/3">
+ <div>
+ <h1 class="text-3xl font-bold">${m.title}</h1>
+ <p class="text-yellow-400">⭐ ${m.vote_average}</p>
+ <p class="text-gray-300 my-3">${m.overview||""}</p>
+
+ <button onclick="playTrailer('${trailer}')" class="bg-white text-black px-4 py-2 rounded">
+ ▶ Watch Trailer
+ </button>
+
+ <div id="trailerBox" class="mt-4"></div>
+ </div>
+ </div>
+ `;
+
+ recommendations.innerHTML=recs.map(r=>`
+ <div class="card" onclick='openMovie(${JSON.stringify(r)})'>
+ <img src="${r.poster_path ? `https://image.tmdb.org/t/p/w300${r.poster_path}` : ''}">
+ </div>`).join("");
+}
+
+function playTrailer(k){
+ if(!k) return alert("No trailer");
+ trailerBox.innerHTML=`<iframe width="100%" height="300"
+ src="https://www.youtube.com/embed/${k}?autoplay=1"></iframe>`;
 }
 
 function closeMoviePage(){
@@ -215,18 +250,28 @@ function closeMoviePage(){
 }
 
 async function load(){
+
  const trending=await fetch(`https://api.themoviedb.org/3/trending/movie/week?api_key=${API_KEY}`).then(r=>r.json());
 
- heroMovie=trending.results[0];
+ heroMovie=trending.results[Math.floor(Math.random()*trending.results.length)];
+
  heroTitle.innerText=heroMovie.title;
  heroDesc.innerText=heroMovie.overview;
+
+ const t=await getTrailer(heroMovie.id);
+ if(t) heroVideo.src=`https://www.youtube.com/embed/${t}?autoplay=1&mute=1`;
 
  top10.innerHTML=trending.results.slice(0,10).map(m=>`
  <div class="card" onclick='openMovie(${JSON.stringify(m)})'>
  <img src="https://image.tmdb.org/t/p/w300${m.poster_path}">
  </div>`).join("");
 
- const genres=[["Action",28],["Comedy",35],["Horror",27]];
+ const genres=[
+ ["Action",28],["Comedy",35],["Horror",27],
+ ["Sci-Fi",878],["Romance",10749],
+ ["Drama",18],["Animation",16]
+ ];
+
  rows.innerHTML="";
 
  for(const [name,id] of genres){
@@ -234,17 +279,19 @@ async function load(){
   const data=await res.json();
 
   rows.innerHTML+=`
-  <h2>${name}</h2>
-  <div class="scroll">
+  <h2 class="mt-4 font-bold">${name}</h2>
+  <div class="scroll mb-4">
   ${data.results.map(m=>`
    <div class="card" onclick='openMovie(${JSON.stringify(m)})'>
    <img src="https://image.tmdb.org/t/p/w300${m.poster_path}">
    </div>`).join("")}
   </div>`;
  }
+
 }
 
 window.onload=load;
+
 </script>
 
 </body>
