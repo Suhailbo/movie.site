@@ -23,7 +23,6 @@ body { background:#000; color:white; }
 
 <body>
 
-<!-- NAV -->
 <nav class="sticky top-0 bg-black/80 backdrop-blur flex justify-between items-center p-3 z-50">
 <h1 onclick="goHome()" class="font-bold cursor-pointer">🎬 MovieHub</h1>
 <input id="searchInput" placeholder="Search movies..." class="bg-gray-900 px-3 py-1 rounded text-sm w-1/2">
@@ -86,8 +85,20 @@ data-full-width-responsive="true"></ins>
 <!-- CONTENT -->
 <div class="px-4">
 
-<h2 class="mb-2">🔥 Top 10</h2>
+<h2>🔥 Top 10</h2>
 <div id="top10" class="scroll mb-6"></div>
+
+<h2>🏆 Top 5 Movies</h2>
+<div id="top5" class="scroll mb-6"></div>
+
+<h2>📺 Streaming Platforms</h2>
+<div id="providers" class="flex gap-3 mb-6"></div>
+
+<h2>🔥 On Netflix</h2>
+<div id="netflixRow" class="scroll mb-6"></div>
+
+<h2>⏳ Coming Soon</h2>
+<div id="upcoming" class="scroll mb-6"></div>
 
 <div id="rows"></div>
 
@@ -159,7 +170,6 @@ runSearch(e.target.value);
 
 async function runSearch(q){
 if(q.length<2)return searchResults.innerHTML="";
-
 const res=await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${q}`);
 const data=await res.json();
 
@@ -172,7 +182,7 @@ searchResults.innerHTML=data.results.map(m=>`
 
 // CARD
 function card(m){
-if(!m.poster_path) return "";
+if(!m.poster_path)return "";
 return `<div class="card" onclick='openMovie(${JSON.stringify(m)})'>
 <img src="https://image.tmdb.org/t/p/w300${m.poster_path}">
 </div>`;
@@ -191,7 +201,6 @@ const providers=prov.results?.NG?.flatrate || [];
 
 movieDetails.innerHTML=`
 <img src="https://image.tmdb.org/t/p/w400${m.poster_path}" class="mb-4 rounded">
-
 <h1 class="text-2xl font-bold">${m.title}</h1>
 <p class="text-yellow-400">⭐ ${m.vote_average}</p>
 <p class="my-3">${m.overview||""}</p>
@@ -206,7 +215,6 @@ ${p.provider_name}
 </div>
 
 <button onclick="playTrailer('${trailer?.key}')" class="bg-white text-black px-4 py-2 mt-3 rounded">▶ Trailer</button>
-
 <div id="trailerBox" class="mt-4"></div>
 `;
 
@@ -218,11 +226,22 @@ if(!k)return alert("No trailer");
 trailerBox.innerHTML=`<iframe width="100%" height="250" src="https://www.youtube.com/embed/${k}?autoplay=1"></iframe>`;
 }
 
-// RECOMMEND
-async function loadRec(id){
-const r=await fetch(`https://api.themoviedb.org/3/movie/${id}/recommendations?api_key=${API_KEY}`);
-const d=await r.json();
-recommendations.innerHTML=d.results.slice(0,10).map(card).join("");
+// EXTRA SECTIONS
+async function loadExtras(){
+const day=await fetch(`https://api.themoviedb.org/3/trending/movie/day?api_key=${API_KEY}`).then(r=>r.json());
+top5.innerHTML=day.results.slice(0,5).map(card).join("");
+
+providers.innerHTML=`
+<button class="bg-gray-800 px-4 py-2 rounded">Netflix</button>
+<button class="bg-gray-800 px-4 py-2 rounded">Prime</button>
+<button class="bg-gray-800 px-4 py-2 rounded">Disney+</button>
+`;
+
+const netflix=await fetch(`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_watch_providers=8&watch_region=NG`).then(r=>r.json());
+netflixRow.innerHTML=netflix.results.map(card).join("");
+
+const upcomingData=await fetch(`https://api.themoviedb.org/3/movie/upcoming?api_key=${API_KEY}`).then(r=>r.json());
+upcoming.innerHTML=upcomingData.results.map(card).join("");
 }
 
 // LOAD
@@ -240,7 +259,7 @@ if(tr)heroVideo.src=`https://www.youtube.com/embed/${tr.key}?autoplay=1&mute=1`;
 top10.innerHTML=t.results.slice(0,10).map(card).join("");
 
 // FULL CATEGORIES
-const genres = [
+const genres=[
 ["Action",28],["Adventure",12],["Animation",16],["Comedy",35],
 ["Crime",80],["Documentary",99],["Drama",18],["Family",10751],
 ["Fantasy",14],["History",36],["Horror",27],["Music",10402],
@@ -252,13 +271,10 @@ rows.innerHTML="";
 for(const [n,id] of genres){
 const r=await fetch(`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=${id}`);
 const d=await r.json();
-
-rows.innerHTML+=`
-<h2 class="mt-6 font-bold">${n}</h2>
-<div class="scroll mb-6">
-${d.results.map(card).join("")}
-</div>`;
+rows.innerHTML+=`<h2 class="mt-6 font-bold">${n}</h2><div class="scroll mb-6">${d.results.map(card).join("")}</div>`;
 }
+
+loadExtras();
 }
 
 // LEGAL
@@ -266,21 +282,14 @@ function openPage(type){
 homePage.style.display="none";
 legalPage.classList.remove("hidden");
 
-if(type==="privacy"){
-legalContent.innerHTML="<h1>Privacy Policy</h1><p>We use AdSense cookies.</p>";
-}
-if(type==="terms"){
-legalContent.innerHTML="<h1>Terms</h1><p>No movies hosted.</p>";
-}
-if(type==="feedback"){
-legalContent.innerHTML=`
-<form action="https://formsubmit.co/eh710214@gmail.com" method="POST">
+if(type==="privacy") legalContent.innerHTML="<h1>Privacy Policy</h1>";
+if(type==="terms") legalContent.innerHTML="<h1>Terms</h1>";
+if(type==="feedback") legalContent.innerHTML=`<form action="https://formsubmit.co/eh710214@gmail.com" method="POST">
 <input name="name" placeholder="Name" class="w-full mb-2 bg-gray-800 p-2 rounded">
 <input name="email" placeholder="Email" class="w-full mb-2 bg-gray-800 p-2 rounded">
 <textarea name="message" class="w-full mb-2 bg-gray-800 p-2 rounded"></textarea>
 <button class="bg-white text-black w-full p-2 rounded">Send</button>
 </form>`;
-}
 }
 
 function closePage(){
