@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MovieHub V5.2 Ultra</title>
+<title>MovieHub V5.3 - Fixed</title>
 <script src="https://cdn.tailwindcss.com"></script>
 
 <!-- ADSENSE -->
@@ -164,7 +164,6 @@ crossorigin="anonymous"></script>
         homePage.style.display = 'block';
     }
 
-    // ====================== SEARCH ======================
     function debounceSearch(e) {
         clearTimeout(debounceTimer);
         debounceTimer = setTimeout(() => {
@@ -176,10 +175,7 @@ crossorigin="anonymous"></script>
     }
 
     async function runSearch(query) {
-        if (query.length < 2) {
-            searchResults.innerHTML = '';
-            return;
-        }
+        if (query.length < 2) { searchResults.innerHTML = ''; return; }
         searchResults.innerHTML = '<p class="text-gray-400 text-center py-8">Searching...</p>';
         try {
             const res = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=\( {API_KEY}&query= \){encodeURIComponent(query)}`);
@@ -238,11 +234,8 @@ crossorigin="anonymous"></script>
         }
     }
 
-    // ====================== LOAD WITH RETRY ======================
     async function load(retry = false) {
-        rowsContainer.innerHTML = retry 
-            ? '<p class="text-gray-400">Retrying...</p>' 
-            : '<p class="text-gray-400">Loading categories...</p>';
+        rowsContainer.innerHTML = retry ? '<p class="text-gray-400">Retrying...</p>' : '<p class="text-gray-400">Loading categories...</p>';
 
         try {
             const trendingRes = await fetch(`https://api.themoviedb.org/3/trending/movie/week?api_key=${API_KEY}`);
@@ -257,42 +250,32 @@ crossorigin="anonymous"></script>
             const heroTrailer = heroVidData.results.find(v => v.type === "Trailer");
             if (heroTrailer) heroVideo.src = `https://www.youtube.com/embed/${heroTrailer.key}?autoplay=1&mute=1`;
 
-            // Top 10
             top10Container.innerHTML = '';
             trending.results.slice(0, 10).forEach(movie => top10Container.appendChild(createMovieCard(movie)));
 
-            // Categories
             rowsContainer.innerHTML = '';
             const genres = [["Action",28],["Comedy",35],["Horror",27],["Drama",18],["Animation",16],["Thriller",53]];
-
             for (const [name, id] of genres) {
                 const res = await fetch(`https://api.themoviedb.org/3/discover/movie?api_key=\( {API_KEY}&with_genres= \){id}`);
                 const data = await res.json();
-
                 const sectionHTML = `<h2 class="mt-6 mb-2 font-bold text-lg">${name}</h2><div class="scroll mb-6"></div>`;
                 rowsContainer.innerHTML += sectionHTML;
                 const scrollDiv = rowsContainer.lastElementChild;
                 data.results.forEach(movie => scrollDiv.appendChild(createMovieCard(movie)));
             }
-
         } catch (err) {
             console.error("Load failed:", err);
             rowsContainer.innerHTML = `
                 <p class="text-red-400 text-center py-6">Couldn't load movies from TMDB.<br>
                 This usually means the API key needs refreshing.</p>
-                <button onclick="load(true)" 
-                        class="mx-auto block mt-4 bg-white text-black px-6 py-2 rounded font-medium">
-                    🔄 Retry
-                </button>`;
+                <button onclick="load(true)" class="mx-auto block mt-4 bg-white text-black px-6 py-2 rounded font-medium">🔄 Retry</button>`;
         }
     }
 
-    // ====================== EVENT LISTENERS ======================
     searchInput.addEventListener('click', () => searchPage.classList.remove('hidden'));
     searchInput.addEventListener('input', debounceSearch);
     searchInput2.addEventListener('input', debounceSearch);
 
-    // ====================== START APP ======================
     window.onload = () => load();
 </script>
 </body>
