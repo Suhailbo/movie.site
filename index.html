@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MovieHub V6 FINAL</title>
+<title>MovieHub V6 ULTRA FINAL</title>
 
 <script src="https://cdn.tailwindcss.com"></script>
 
@@ -23,6 +23,7 @@ body { background:#000; color:white; }
 
 <body>
 
+<!-- NAV -->
 <nav class="sticky top-0 bg-black/80 backdrop-blur flex justify-between items-center p-3 z-50">
 <h1 onclick="goHome()" class="font-bold cursor-pointer">🎬 MovieHub</h1>
 <input id="searchInput" placeholder="Search movies..." class="bg-gray-900 px-3 py-1 rounded text-sm w-1/2">
@@ -43,9 +44,15 @@ body { background:#000; color:white; }
 <div id="moviePage" class="hidden fixed inset-0 bg-black z-50 p-4 overflow-y-auto">
 <button onclick="closeMoviePage()">← Back</button>
 <div id="movieDetails"></div>
-
 <h2 class="mt-6 text-xl font-bold">🤖 Recommended</h2>
 <div id="recommendations" class="scroll mt-3"></div>
+</div>
+
+<!-- SECTION PAGE -->
+<div id="sectionPage" class="hidden fixed inset-0 bg-black z-50 p-4 overflow-y-auto">
+<button onclick="closeSection()">← Back</button>
+<h1 id="sectionTitle" class="text-xl font-bold my-3"></h1>
+<div id="sectionContent"></div>
 </div>
 
 <!-- LEGAL -->
@@ -71,6 +78,14 @@ body { background:#000; color:white; }
 </div>
 </div>
 
+<!-- NAV LINKS -->
+<div class="px-4 mt-4 flex gap-4 overflow-x-auto text-sm font-medium">
+<span onclick="openSection('top5')" class="cursor-pointer text-purple-400">Top 5 Movies</span>
+<span onclick="openSection('platforms')" class="cursor-pointer text-purple-400">Streaming Platforms</span>
+<span onclick="openSection('netflix')" class="cursor-pointer text-purple-400">On Netflix</span>
+<span onclick="openSection('upcoming')" class="cursor-pointer text-purple-400">Coming Soon</span>
+</div>
+
 <!-- ADS -->
 <div class="my-4 px-4 text-center">
 <ins class="adsbygoogle"
@@ -87,18 +102,6 @@ data-full-width-responsive="true"></ins>
 
 <h2>🔥 Top 10</h2>
 <div id="top10" class="scroll mb-6"></div>
-
-<h2>🏆 Top 5 Movies</h2>
-<div id="top5" class="scroll mb-6"></div>
-
-<h2>📺 Streaming Platforms</h2>
-<div id="providers" class="flex gap-3 mb-6"></div>
-
-<h2>🔥 On Netflix</h2>
-<div id="netflixRow" class="scroll mb-6"></div>
-
-<h2>⏳ Coming Soon</h2>
-<div id="upcoming" class="scroll mb-6"></div>
 
 <div id="rows"></div>
 
@@ -137,10 +140,10 @@ function stopAllVideos(){
 document.querySelectorAll("iframe").forEach(v=>v.src=v.src);
 }
 
-// NAV
 function goHome(){
 stopAllVideos();
 moviePage.classList.add("hidden");
+sectionPage.classList.add("hidden");
 searchPage.classList.add("hidden");
 homePage.style.display="block";
 }
@@ -155,7 +158,6 @@ function closeSearch(){
 searchPage.classList.add("hidden");
 }
 
-// SEARCH
 searchInput.onclick=()=>searchPage.classList.remove("hidden");
 
 searchInput.oninput=e=>{
@@ -172,7 +174,6 @@ async function runSearch(q){
 if(q.length<2)return searchResults.innerHTML="";
 const res=await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${q}`);
 const data=await res.json();
-
 searchResults.innerHTML=data.results.map(m=>`
 <div onclick='openMovie(${JSON.stringify(m)})' class="flex gap-3 bg-gray-900 p-3 mb-3 rounded cursor-pointer">
 <img src="https://image.tmdb.org/t/p/w200${m.poster_path}" class="w-16 rounded">
@@ -180,7 +181,6 @@ searchResults.innerHTML=data.results.map(m=>`
 </div>`).join("");
 }
 
-// CARD
 function card(m){
 if(!m.poster_path)return "";
 return `<div class="card" onclick='openMovie(${JSON.stringify(m)})'>
@@ -188,7 +188,6 @@ return `<div class="card" onclick='openMovie(${JSON.stringify(m)})'>
 </div>`;
 }
 
-// MOVIE
 async function openMovie(m){
 homePage.style.display="none";
 moviePage.classList.remove("hidden");
@@ -208,10 +207,11 @@ movieDetails.innerHTML=`
 <h3 class="mt-3 font-bold">📺 Watch On</h3>
 <div class="flex gap-2 flex-wrap mt-2">
 ${providers.length ? providers.map(p=>`
-<div class="bg-gray-800 px-3 py-2 rounded flex items-center gap-2">
+<a href="https://www.justwatch.com/ng/search?q=${encodeURIComponent(m.title)}" target="_blank"
+class="bg-gray-800 px-3 py-2 rounded flex items-center gap-2">
 <img src="https://image.tmdb.org/t/p/w45${p.logo_path}" class="w-5">
 ${p.provider_name}
-</div>`).join("") : "<p class='text-gray-400'>Not available</p>"}
+</a>`).join("") : "<p class='text-gray-400'>Not available</p>"}
 </div>
 
 <button onclick="playTrailer('${trailer?.key}')" class="bg-white text-black px-4 py-2 mt-3 rounded">▶ Trailer</button>
@@ -226,29 +226,69 @@ if(!k)return alert("No trailer");
 trailerBox.innerHTML=`<iframe width="100%" height="250" src="https://www.youtube.com/embed/${k}?autoplay=1"></iframe>`;
 }
 
-// EXTRA SECTIONS
-async function loadExtras(){
-const day=await fetch(`https://api.themoviedb.org/3/trending/movie/day?api_key=${API_KEY}`).then(r=>r.json());
-top5.innerHTML=day.results.slice(0,5).map(card).join("");
-
-providers.innerHTML=`
-<button class="bg-gray-800 px-4 py-2 rounded">Netflix</button>
-<button class="bg-gray-800 px-4 py-2 rounded">Prime</button>
-<button class="bg-gray-800 px-4 py-2 rounded">Disney+</button>
-`;
-
-const netflix=await fetch(`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_watch_providers=8&watch_region=NG`).then(r=>r.json());
-netflixRow.innerHTML=netflix.results.map(card).join("");
-
-const upcomingData=await fetch(`https://api.themoviedb.org/3/movie/upcoming?api_key=${API_KEY}`).then(r=>r.json());
-upcoming.innerHTML=upcomingData.results.map(card).join("");
+async function loadRec(id){
+const r=await fetch(`https://api.themoviedb.org/3/movie/${id}/recommendations?api_key=${API_KEY}`);
+const d=await r.json();
+recommendations.innerHTML=d.results.slice(0,10).map(card).join("");
 }
 
-// LOAD
+/* SECTION PAGE */
+
+function openSection(type){
+homePage.style.display="none";
+sectionPage.classList.remove("hidden");
+sectionContent.innerHTML="Loading...";
+
+if(type==="top5"){ sectionTitle.innerText="Top 5 Movies"; loadTop5(); }
+if(type==="platforms"){ sectionTitle.innerText="Streaming Platforms"; loadPlatforms(); }
+if(type==="netflix"){ sectionTitle.innerText="On Netflix"; loadNetflix(); }
+if(type==="upcoming"){ sectionTitle.innerText="Coming Soon"; loadUpcoming(); }
+}
+
+function closeSection(){
+sectionPage.classList.add("hidden");
+homePage.style.display="block";
+}
+
+async function loadTop5(){
+const r=await fetch(`https://api.themoviedb.org/3/trending/movie/day?api_key=${API_KEY}`);
+const d=await r.json();
+sectionContent.innerHTML=d.results.slice(0,5).map(card).join("");
+}
+
+function loadPlatforms(){
+sectionContent.innerHTML=`
+<div class="flex gap-3 flex-wrap">
+<button onclick="loadByProvider(8)" class="bg-gray-800 px-4 py-2 rounded">Netflix</button>
+<button onclick="loadByProvider(9)" class="bg-gray-800 px-4 py-2 rounded">Prime</button>
+<button onclick="loadByProvider(337)" class="bg-gray-800 px-4 py-2 rounded">Disney+</button>
+</div>
+<div id="providerResults" class="scroll mt-4"></div>`;
+}
+
+async function loadByProvider(id){
+const res=await fetch(`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_watch_providers=${id}&watch_region=NG`);
+const d=await res.json();
+document.getElementById("providerResults").innerHTML=d.results.map(card).join("");
+}
+
+async function loadNetflix(){
+const r=await fetch(`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_watch_providers=8&watch_region=NG`);
+const d=await r.json();
+sectionContent.innerHTML=d.results.map(card).join("");
+}
+
+async function loadUpcoming(){
+const r=await fetch(`https://api.themoviedb.org/3/movie/upcoming?api_key=${API_KEY}`);
+const d=await r.json();
+sectionContent.innerHTML=d.results.map(card).join("");
+}
+
+/* LOAD */
 async function load(){
 const t=await fetch(`https://api.themoviedb.org/3/trending/movie/week?api_key=${API_KEY}`).then(r=>r.json());
 
-heroMovie=t.results[0];
+heroMovie = t.results[Math.floor(Math.random()*t.results.length)];
 heroTitle.innerText=heroMovie.title;
 heroDesc.innerText=heroMovie.overview;
 
@@ -258,7 +298,6 @@ if(tr)heroVideo.src=`https://www.youtube.com/embed/${tr.key}?autoplay=1&mute=1`;
 
 top10.innerHTML=t.results.slice(0,10).map(card).join("");
 
-// FULL CATEGORIES
 const genres=[
 ["Action",28],["Adventure",12],["Animation",16],["Comedy",35],
 ["Crime",80],["Documentary",99],["Drama",18],["Family",10751],
@@ -273,28 +312,6 @@ const r=await fetch(`https://api.themoviedb.org/3/discover/movie?api_key=${API_K
 const d=await r.json();
 rows.innerHTML+=`<h2 class="mt-6 font-bold">${n}</h2><div class="scroll mb-6">${d.results.map(card).join("")}</div>`;
 }
-
-loadExtras();
-}
-
-// LEGAL
-function openPage(type){
-homePage.style.display="none";
-legalPage.classList.remove("hidden");
-
-if(type==="privacy") legalContent.innerHTML="<h1>Privacy Policy</h1>";
-if(type==="terms") legalContent.innerHTML="<h1>Terms</h1>";
-if(type==="feedback") legalContent.innerHTML=`<form action="https://formsubmit.co/eh710214@gmail.com" method="POST">
-<input name="name" placeholder="Name" class="w-full mb-2 bg-gray-800 p-2 rounded">
-<input name="email" placeholder="Email" class="w-full mb-2 bg-gray-800 p-2 rounded">
-<textarea name="message" class="w-full mb-2 bg-gray-800 p-2 rounded"></textarea>
-<button class="bg-white text-black w-full p-2 rounded">Send</button>
-</form>`;
-}
-
-function closePage(){
-legalPage.classList.add("hidden");
-homePage.style.display="block";
 }
 
 window.onload=load;
